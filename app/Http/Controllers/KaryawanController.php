@@ -79,18 +79,19 @@ class KaryawanController extends Controller
     $masters = [];
 
     $endpoints = [
-        'agamas' => '/agama',
-        'profesis' => '/profesi',
-        'units' => '/unit',
-        'jabatans' => '/jabatan',
-        'golongans' => '/golongan',
-        'tipes' => '/tipe'
-    ];
+    'agamas' => '/agama',
+    'profesis' => '/profesi',
+    'units' => '/unit',
+    'jabatans' => '/jabatan',
+    'golongans' => '/golongan',
+    'tipes' => '/tipe'
+];
 
-    foreach ($endpoints as $key => $url) {
-        $response = Http::withToken($this->token())->get($this->apiBase . $url);
-        $masters[$key] = $response->successful() ? $response->json()['data'] : [];
-    }
+foreach ($endpoints as $key => $url) {
+    $response = Http::withToken($this->token())->get($this->apiBase . $url);
+    $masters[$key] = $response->successful() ? $response->json()['data'] : [];
+}
+
 
     return $masters;
 }

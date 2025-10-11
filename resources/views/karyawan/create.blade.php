@@ -150,13 +150,14 @@
                     {{-- Master Data --}}
                     @php
                         function selectOption($data, $oldKey, $valueKey, $nameKey) {
-                            foreach($data ?? [] as $item) {
-                                $value = is_array($item) ? $item[$valueKey] : $item->$valueKey;
-                                $name = is_array($item) ? $item[$nameKey] : $item->$nameKey;
-                                $selected = old($oldKey) == $value ? 'selected' : '';
-                                echo "<option value='{$value}' {$selected}>{$name}</option>";
-                            }
-                        }
+    foreach($data ?? [] as $item) {
+        $value = is_array($item) ? $item[$valueKey] : $item->$valueKey;
+        $name = is_array($item) ? $item[$nameKey] : $item->$nameKey;
+        $selected = old($oldKey) == $value ? 'selected' : '';
+        echo "<option value='{$value}' {$selected}>{$name}</option>";
+    }
+}
+
                     @endphp
 
                     <div class="col-md-4">
