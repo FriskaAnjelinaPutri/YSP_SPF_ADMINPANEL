@@ -6,44 +6,127 @@
 <div class="container-fluid">
 
     {{-- Custom Styles Dashboard --}}
-    <style>
-        body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
-        .card { border-radius: 20px; transition: 0.3s; }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
-        .card-header { border-top-left-radius: 20px !important; border-top-right-radius: 20px !important; background: linear-gradient(90deg, #118ab2, #06d6a0); color: #fff; }
-        .shadow-soft { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-        .fw-semibold { font-weight: 600 !important; }
-        .table-hover tbody tr:hover { background-color: rgba(17,138,178,0.08); transition: 0.2s; }
-        .table th, .table td { vertical-align: middle; }
-        .badge { font-size: 0.75rem; padding: 0.4em 0.8em; border-radius: 12px; }
-        .badge-success { background: linear-gradient(45deg,#06d6a0,#118ab2); color: #fff; }
-        .badge-warning { background: linear-gradient(45deg,#ffd166,#ef476f); color: #fff; }
-        .badge-primary { background: linear-gradient(45deg,#118ab2,#06d6a0); color: #fff; }
-        .badge-danger { background: linear-gradient(45deg,#ef476f,#ffd166); color: #fff; }
-        .text-secondary { color: #6c757d !important; }
-        small { display: block; font-size: 0.75rem; color: #6c757d; }
-        .btn-rounded { border-radius: 50px; transition: 0.2s; }
-        .btn-rounded:hover { transform: scale(1.05); }
-        td.text-center .btn { margin-bottom: 2px; }
+<style>
+/* === General === */
+body {
+    background-color: #f4f6f9;
+    font-family: 'Poppins', sans-serif;
+}
+h3, h5 { font-weight: 600; }
+.text-primary { color: #118ab2 !important; }
+.text-secondary { color: #6c757d !important; }
 
-        /* Search */
-        #searchInput { transition: all 0.3s; }
-        #searchInput:focus { box-shadow: 0 0 10px rgba(17,138,178,0.3); }
+/* === Card === */
+.card {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+.card-header {
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    background: linear-gradient(90deg, #118ab2, #06d6a0);
+    color: #fff;
+}
 
-        /* Modal */
-        .modal-body { max-height: 70vh; overflow-y: auto; }
-        .modal-body table th { width: 180px; font-weight: 600; color: #118ab2; }
-        .modal-body table td { word-break: break-word; }
-        .modal-content { border-radius: 20px; }
-        .modal-header { background: linear-gradient(90deg,#118ab2,#06d6a0); color: #fff; }
-        @media (max-width: 768px) {
-            .modal-body table th { width: 120px; font-size: 0.75rem; }
-            .modal-body table td { font-size: 0.75rem; }
-        }
+/* === Table === */
+.table-hover tbody tr:hover {
+    background-color: rgba(17,138,178,0.08);
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+.table th, .table td {
+    vertical-align: middle;
+    padding: 12px 15px;
+}
+.table td strong { font-size: 0.95rem; }
+.table td small { font-size: 0.75rem; color: #6c757d; }
 
-        /* Spinner Center */
-        .spinner-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; }
-    </style>
+/* === Badges === */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.8em;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+.badge-success { background: linear-gradient(45deg,#06d6a0,#118ab2); color: #fff; }
+.badge-warning { background: linear-gradient(45deg,#ffd166,#ef476f); color: #fff; }
+.badge-primary { background: linear-gradient(45deg,#118ab2,#06d6a0); color: #fff; }
+.badge-danger { background: linear-gradient(45deg,#ef476f,#ffd166); color: #fff; }
+
+/* === Buttons === */
+.btn-rounded {
+    border-radius: 50px;
+    transition: transform 0.2s ease;
+}
+.btn-rounded:hover { transform: scale(1.05); }
+td.text-center .btn { margin-bottom: 2px; }
+
+/* === Search === */
+#searchInput {
+    transition: all 0.3s ease;
+    border-radius: 50px 0 0 50px;
+    border-right: none;
+}
+#searchInput:focus { box-shadow: 0 0 10px rgba(17,138,178,0.3); }
+#searchForm button {
+    border-radius: 0 50px 50px 0;
+    border-left: none;
+}
+
+/* === Alerts === */
+.alert {
+    border-radius: 15px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+}
+
+/* === Modal === */
+.modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+.modal-header {
+    background: linear-gradient(90deg,#118ab2,#06d6a0);
+    color: #fff;
+    border-bottom: none;
+}
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.modal-body table th {
+    width: 180px;
+    font-weight: 600;
+    color: #118ab2;
+}
+.modal-body table td { word-break: break-word; }
+.modal-footer .btn-rounded { min-width: 100px; }
+
+/* === Spinner === */
+.spinner-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: #118ab2;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .modal-body table th { width: 120px; font-size: 0.75rem; }
+    .modal-body table td { font-size: 0.75rem; }
+    #searchForm { width: 100% !important; }
+}
+</style>
+
 
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
