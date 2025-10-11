@@ -4,48 +4,75 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
+    /**
+     * Tampilkan halaman login
+     */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
+    /**
+     * Proses login
+     */
     public function login(Request $request)
     {
         // Validasi input
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password' => 'required|min:6'
         ]);
 
-        // Panggil API login
-        $response = Http::post(env('API_URL') . '/login', [
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+        try {
+            // Panggil API login
+            $response = Http::post(env('API_URL') . '/login', [
+                'email' => $request->email,
+                'password' => $request->password,
+            ]);
 
-        $data = $response->json();
+            $data = $response->json();
 
-        // Cek apakah ada token
-        if (!isset($data['data']['access_token'])) {
-            return back()->with('error', $data['message'] ?? 'Login gagal, coba lagi.');
+            // Debug: cek struktur response
+            // dd($data);
+
+            // Pastikan login sukses
+            if (!($data['success'] ?? false)) {
+                return back()->with('error', $data['message'] ?? 'Login gagal, coba lagi.');
+            }
+
+            // Ambil token dan user dari response
+            $token = $data['data']['access_token'] ?? null;
+            $user  = $data['data']['user'] ?? null;
+
+            if (!$token || !$user) {
+                return back()->with('error', 'Login gagal, token atau data user tidak tersedia.');
+            }
+
+            // Simpan ke session
+            Session::put('api_token', $token);
+            Session::put('user', $user);
+
+            // Redirect ke dashboard atau halaman sebelumnya
+            return redirect()->intended(route('dashboard'));
+
+        } catch (\Exception $e) {
+            // Tangani error koneksi/API
+            return back()->with('error', 'Gagal menghubungi server, silakan coba lagi.');
         }
-
-        // Simpan token & user ke session
-        session([
-            'api_token' => $data['data']['access_token'],
-            'user' => $data['data']['user']
-        ]);
-
-        // Redirect ke halaman yang diminta sebelumnya, atau ke dashboard
-        return redirect()->intended(route('dashboard'));
     }
 
+    /**
+     * Logout
+     */
     public function logout()
     {
-        session()->forget(['api_token', 'user']);
+        // Hapus session
+        Session::forget(['api_token', 'user']);
+
         return redirect()->route('login');
     }
 }

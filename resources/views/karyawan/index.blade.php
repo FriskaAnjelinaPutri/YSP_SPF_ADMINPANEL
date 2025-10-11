@@ -5,6 +5,24 @@
 @section('content')
 <div class="container-fluid">
 
+    {{-- Custom Styles Dashboard --}}
+    <style>
+        body { background-color: #f8fafc; font-family: 'Poppins', sans-serif; }
+        .card { border-radius: 15px; }
+        .card-header { border-top-left-radius: 15px !important; border-top-right-radius: 15px !important; }
+        .shadow-soft { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+        .fw-semibold { font-weight: 600 !important; }
+        .bg-sp-primary { background-color: #118ab2 !important; color: #fff !important; }
+        .bg-sp-success { background-color: #06d6a0 !important; color: #fff !important; }
+        .bg-sp-warning { background-color: #ffd166 !important; color: #333 !important; }
+        .bg-sp-danger { background-color: #ef476f !important; color: #fff !important; }
+        .table-hover tbody tr:hover { background-color: rgba(17,138,178,0.05); }
+        .badge { font-size: 0.8rem; }
+        .text-secondary { color: #6c757d !important; }
+        small { display: block; }
+        .btn-rounded { border-radius: 50px; }
+    </style>
+
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -13,198 +31,225 @@
             </h3>
             <small class="text-muted">Manajemen data karyawan Rumah Sakit</small>
         </div>
-        <a href="{{ route('karyawan.create') }}" class="btn btn-primary shadow-sm">
+        <a href="{{ route('karyawan.create') }}" class="btn btn-primary shadow-sm btn-rounded">
             <i class="bi bi-person-plus-fill me-1"></i> Tambah Karyawan
         </a>
     </div>
 
     {{-- Alerts --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-soft" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+    @if(session('error') || isset($error))
+        <div class="alert alert-danger alert-dismissible fade show shadow-soft" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') ?? $error }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    {{-- Table Card --}}
-    <div class="card border-0 shadow-sm rounded-4">
+    {{-- Card Table --}}
+    <div class="card border-0 shadow-soft mb-4">
         <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-semibold text-secondary">
                 <i class="bi bi-list-ul me-2 text-primary"></i>Daftar Karyawan
             </h5>
-            <div class="input-group" style="width: 250px;">
-                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
-                <input id="searchKaryawan" type="text" class="form-control border-start-0" placeholder="Cari karyawan...">
-            </div>
+            <form method="GET" action="{{ route('karyawan.index') }}" class="d-flex" style="width: 280px;" id="searchForm">
+                <input name="search" id="searchInput" type="text" class="form-control border-end-0" placeholder="Cari karyawan..." value="{{ request('search') }}">
+                <button type="submit" class="btn btn-outline-secondary border-start-0"><i class="bi bi-search"></i></button>
+            </form>
         </div>
 
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="tabelKaryawan">
-                    <thead class="bg-primary text-white">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-sp-primary text-white">
                         <tr>
-                            <th>Kode</th>
                             <th>Nama</th>
-                            <th>Email</th>
                             <th>No HP</th>
+                            <th>Golongan</th>
                             <th>Jabatan</th>
                             <th>Unit</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="dataKaryawan">
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <div class="spinner-border text-primary" role="status"></div>
-                                <div>Memuat data...</div>
-                            </td>
-                        </tr>
+                    <tbody id="karyawanTbody">
+                        @forelse($karyawans as $kar)
+                            <tr>
+                                <td>
+                                    <strong>{{ $kar->kar_nama }}</strong>
+                                    <small class="text-muted">{{ $kar->kar_email }}</small>
+                                </td>
+                                <td>{{ $kar->kar_hp ?? '-' }}</td>
+                                <td><span class="badge bg-sp-success">{{ $kar->golongan->golongan_nama ?? '-' }}</span></td>
+                                <td><span class="badge bg-sp-warning">{{ $kar->jabatan->jabatan_nama ?? '-' }}</span></td>
+                                <td><span class="badge bg-sp-primary">{{ $kar->unit->unit_nama ?? '-' }}</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-info me-1" title="Detail"
+                                        data-kar_kode="{{ $kar->kar_kode }}" data-bs-toggle="modal" data-bs-target="#karyawanDetailModal">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <a href="{{ route('karyawan.edit', $kar->kar_kode) }}" class="btn btn-sm btn-outline-warning me-1" title="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form method="POST" action="{{ route('karyawan.destroy', $kar->kar_kode) }}" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus karyawan ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox me-2 fs-5"></i>Belum ada data karyawan
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
 </div>
 
-{{-- Script untuk Fetch API --}}
+{{-- Modal Detail Karyawan --}}
+<div class="modal fade" id="karyawanDetailModal" tabindex="-1" aria-labelledby="karyawanDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content shadow-soft">
+      <div class="modal-header bg-sp-primary text-white">
+        <h5 class="modal-title" id="karyawanDetailModalLabel">Detail Karyawan</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="detailSpinner" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status"></div>
+          <div class="mt-2">Memuat data...</div>
+        </div>
+        <div id="detailContent" class="d-none">
+          <table class="table table-borderless table-striped">
+            <tbody>
+              <tr><th>Kode</th><td id="detail_kar_kode"></td></tr>
+              <tr><th>NIP</th><td id="detail_kar_nip"></td></tr>
+              <tr><th>NIK</th><td id="detail_kar_nik"></td></tr>
+              <tr><th>Nama</th><td id="detail_kar_nama"></td></tr>
+              <tr><th>Gelar Depan</th><td id="detail_kar_gelar_depan"></td></tr>
+              <tr><th>Gelar Belakang</th><td id="detail_kar_gelar_belakang"></td></tr>
+              <tr><th>Tempat Lahir</th><td id="detail_kar_lahir_tmp"></td></tr>
+              <tr><th>Tanggal Lahir</th><td id="detail_kar_lahir_tgl"></td></tr>
+              <tr><th>Jenis Kelamin</th><td id="detail_kar_jekel"></td></tr>
+              <tr><th>Alamat</th><td id="detail_kar_alamat"></td></tr>
+              <tr><th>Email</th><td id="detail_kar_email"></td></tr>
+              <tr><th>Email Perusahaan</th><td id="detail_kar_email_perusahaan"></td></tr>
+              <tr><th>No HP</th><td id="detail_kar_hp"></td></tr>
+              <tr><th>WA</th><td id="detail_kar_wa"></td></tr>
+              <tr><th>Telegram</th><td id="detail_kar_telegram"></td></tr>
+              <tr><th>No Rekening</th><td id="detail_kar_norek"></td></tr>
+              <tr><th>No BPJS</th><td id="detail_kar_nobpjs"></td></tr>
+              <tr><th>No Jamsostek</th><td id="detail_kar_nojamsostek"></td></tr>
+              <tr><th>NPWP</th><td id="detail_kar_npwp"></td></tr>
+              <tr><th>Agama</th><td id="detail_agama"></td></tr>
+              <tr><th>Profesi</th><td id="detail_profesi"></td></tr>
+              <tr><th>Status</th><td id="detail_status"></td></tr>
+              <tr><th>Unit</th><td id="detail_unit"></td></tr>
+              <tr><th>Jabatan</th><td id="detail_jabatan"></td></tr>
+              <tr><th>Golongan</th><td id="detail_golongan"></td></tr>
+              <tr><th>Tipe</th><td id="detail_tipe"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-rounded" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- Script pencarian dan modal --}}
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const apiURL = "http://127.0.0.1:8000/api/karyawan";
-    const tbody = document.getElementById('dataKaryawan');
-    const searchInput = document.getElementById('searchKaryawan');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    let timeout;
 
-    // Ambil token dari localStorage (pastikan diset waktu login)
-    const token = localStorage.getItem('token');
-
-    // Kalau belum ada token, beri pesan error
-    if (!token) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center text-danger py-4">
-                    <i class="bi bi-x-circle me-2"></i>Token login tidak ditemukan.<br>
-                    Silakan login kembali.
-                </td>
-            </tr>`;
-        return;
-    }
-
-    // Fungsi untuk ambil data dari API
-    function loadKaryawan(query = '') {
-        fetch(apiURL, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Gagal mengakses API. Status: ' + response.status);
-            }
-            return response.json();
-        })
-        .then(result => {
-            tbody.innerHTML = '';
-
-            if (!result.success || !Array.isArray(result.data) || result.data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
-                            <i class="bi bi-inbox me-2 fs-5"></i>Belum ada data karyawan
-                        </td>
-                    </tr>`;
-                return;
-            }
-
-            // Filter pencarian
-            const filtered = result.data.filter(k =>
-                k.kar_nama?.toLowerCase().includes(query.toLowerCase()) ||
-                k.kar_email?.toLowerCase().includes(query.toLowerCase()) ||
-                k.kar_kode?.toLowerCase().includes(query.toLowerCase())
-            );
-
-            // Render baris tabel
-            filtered.forEach(kar => {
-                const jabatan = kar.jabatan?.nama ?? '-';
-                const unit = kar.unit?.nama ?? '-';
-                const email = kar.kar_email ?? '-';
-                const hp = kar.kar_hp ?? '-';
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="fw-semibold text-secondary">${kar.kar_kode}</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width:35px; height:35px;">
-                                    <i class="bi bi-person-fill"></i>
-                                </div>
-                                <div class="ms-2">
-                                    <div class="fw-semibold">${kar.kar_nama}</div>
-                                    <small class="text-muted">${email}</small>
-                                </div>
-                            </div>
-                        </td>
-                        <td>${email}</td>
-                        <td>${hp}</td>
-                        <td><span class="badge bg-info text-dark">${jabatan}</span></td>
-                        <td><span class="badge bg-secondary">${unit}</span></td>
-                        <td class="text-center">
-                            <a href="/karyawan/${kar.kar_kode}/edit" class="btn btn-sm btn-outline-warning me-1">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger" onclick="hapusKaryawan('${kar.id}')">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        })
-        .catch(err => {
-            console.error(err);
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-center text-danger py-4">
-                        <i class="bi bi-x-circle me-2"></i>Gagal memuat data karyawan.<br>
-                        ${err.message}
-                    </td>
-                </tr>`;
-        });
-    }
-
-    // Hapus karyawan
-    window.hapusKaryawan = function(id) {
-        if (!confirm("Yakin ingin menghapus karyawan ini?")) return;
-
-        fetch(`/api/karyawan/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Accept': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(result => {
-            alert(result.message);
-            loadKaryawan();
-        })
-        .catch(err => alert("Gagal menghapus karyawan"));
-    };
-
-    // Event pencarian realtime
-    searchInput.addEventListener('keyup', () => {
-        const query = searchInput.value.trim();
-        loadKaryawan(query);
+    searchInput.addEventListener('keyup', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => searchForm.submit(), 500);
     });
 
-    // Panggil pertama kali
-    loadKaryawan();
+    searchForm.addEventListener('submit', function() {
+        const tbody = document.getElementById('karyawanTbody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2">Mencari data...</div>
+                </td>
+            </tr>
+        `;
+    });
+
+    var karyawanDetailModal = document.getElementById('karyawanDetailModal');
+    karyawanDetailModal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget;
+        var kar_kode = button.getAttribute('data-kar_kode');
+
+        var spinner = document.getElementById('detailSpinner');
+        var content = document.getElementById('detailContent');
+
+        spinner.classList.remove('d-none');
+        content.classList.add('d-none');
+
+        fetch(`{{ $apiBase ?? 'http://127.0.0.1:8000/api' }}/karyawan/${kar_kode}`, {
+            headers: {
+                'Authorization': 'Bearer {{ session('api_token') }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            content.classList.remove('d-none');
+
+            const kar = data.data || {};
+            document.getElementById('detail_kar_kode').innerText = kar.kar_kode || '-';
+            document.getElementById('detail_kar_nip').innerText = kar.kar_nip || '-';
+            document.getElementById('detail_kar_nik').innerText = kar.kar_nik || '-';
+            document.getElementById('detail_kar_nama').innerText = kar.kar_nama || '-';
+            document.getElementById('detail_kar_gelar_depan').innerText = kar.kar_gelar_depan || '-';
+            document.getElementById('detail_kar_gelar_belakang').innerText = kar.kar_gelar_belakang || '-';
+            document.getElementById('detail_kar_lahir_tmp').innerText = kar.kar_lahir_tmp || '-';
+            document.getElementById('detail_kar_lahir_tgl').innerText = kar.kar_lahir_tgl || '-';
+            document.getElementById('detail_kar_jekel').innerText = kar.kar_jekel || '-';
+            document.getElementById('detail_kar_alamat').innerText = kar.kar_alamat || '-';
+            document.getElementById('detail_kar_email').innerText = kar.kar_email || '-';
+            document.getElementById('detail_kar_email_perusahaan').innerText = kar.kar_email_perusahaan || '-';
+            document.getElementById('detail_kar_hp').innerText = kar.kar_hp || '-';
+            document.getElementById('detail_kar_wa').innerText = kar.kar_wa || '-';
+            document.getElementById('detail_kar_telegram').innerText = kar.kar_telegram || '-';
+            document.getElementById('detail_kar_norek').innerText = kar.kar_norek || '-';
+            document.getElementById('detail_kar_nobpjs').innerText = kar.kar_nobpjs || '-';
+            document.getElementById('detail_kar_nojamsostek').innerText = kar.kar_nojamsostek || '-';
+            document.getElementById('detail_kar_npwp').innerText = kar.kar_npwp || '-';
+            document.getElementById('detail_agama').innerText = kar.agama?.agama_nama || '-';
+            document.getElementById('detail_profesi').innerText = kar.profesi?.profesi_nama || '-';
+            document.getElementById('detail_status').innerText = kar.status?.status_nama || '-';
+            document.getElementById('detail_unit').innerText = kar.unit?.unit_nama || '-';
+            document.getElementById('detail_jabatan').innerText = kar.jabatan?.jabatan_nama || '-';
+            document.getElementById('detail_golongan').innerText = kar.golongan?.golongan_nama || '-';
+            document.getElementById('detail_tipe').innerText = kar.tipe?.tipe_nama || '-';
+        })
+        .catch(err => {
+            spinner.innerHTML = `<p class="text-danger">Gagal memuat data. Coba lagi.</p>`;
+            content.classList.add('d-none');
+        });
+    });
 });
 </script>
 @endsection
