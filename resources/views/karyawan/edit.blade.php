@@ -219,6 +219,14 @@
                     </div>
 
                     <div class="col-md-4">
+                        <label for="status_kode" class="form-label fw-semibold">Status</label>
+                        <select class="form-select" id="status_kode" name="status_kode">
+                            <option value="">-- Pilih --</option>
+                            {!! selectOption($statuses, 'status_kode', 'status_kode', 'status_nama', $karyawan->status_kode) !!}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
                         <label for="tipe_kode" class="form-label fw-semibold">Tipe</label>
                         <select class="form-select" id="tipe_kode" name="tipe_kode">
                             <option value="">-- Pilih --</option>
