@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 
@@ -24,7 +25,7 @@ class LoginController extends Controller
         // Validasi input
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
         ]);
 
         try {
@@ -34,34 +35,59 @@ class LoginController extends Controller
                 'password' => $request->password,
             ]);
 
-            $data = $response->json();
+            // Cek jika request gagal (HTTP error)
+            if ($response->failed()) {
+                return back()->withInput($request->only('email'))->with('error', 'Login gagal. Periksa email dan password Anda.');
+            }
 
-            // Debug: cek struktur response
-            // dd($data);
+            $data = $response->json();
 
             // Pastikan login sukses
             if (!($data['success'] ?? false)) {
-                return back()->with('error', $data['message'] ?? 'Login gagal, coba lagi.');
+                return back()
+                    ->withInput($request->only('email'))
+                    ->with('error', $data['message'] ?? 'Login gagal, coba lagi.');
             }
 
             // Ambil token dan user dari response
             $token = $data['data']['access_token'] ?? null;
-            $user  = $data['data']['user'] ?? null;
+            $user = $data['data']['user'] ?? null;
 
+            // Validasi token dan user
             if (!$token || !$user) {
-                return back()->with('error', 'Login gagal, token atau data user tidak tersedia.');
+                return back()->withInput($request->only('email'))->with('error', 'Login gagal, token atau data user tidak tersedia.');
+            }
+
+            // Cek role - Hanya admin yang boleh login
+            if (!isset($user['role']) || $user['role'] !== 'admin') {
+                return back()->withInput($request->only('email'))->with('error', 'Akses ditolak. Hanya admin yang dapat mengakses panel ini.');
             }
 
             // Simpan ke session
             Session::put('api_token', $token);
             Session::put('user', $user);
 
-            // Redirect ke dashboard atau halaman sebelumnya
-            return redirect()->intended(route('dashboard'));
+            // Log aktivitas (opsional)
+            Log::info('Admin login berhasil', [
+                'email' => $user['email'] ?? 'unknown',
+                'role' => $user['role'] ?? 'unknown',
+            ]);
 
+            // Redirect ke dashboard atau halaman sebelumnya
+            return redirect()
+                ->intended(route('dashboard'))
+                ->with('success', 'Selamat datang, ' . ($user['name'] ?? 'Admin') . '!');
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Error koneksi ke API
+            Log::error('Login API connection error', ['error' => $e->getMessage()]);
+            return back()->withInput($request->only('email'))->with('error', 'Tidak dapat terhubung ke server. Silakan coba lagi.');
         } catch (\Exception $e) {
-            // Tangani error koneksi/API
-            return back()->with('error', 'Gagal menghubungi server, silakan coba lagi.');
+            // Error umum lainnya
+            Log::error('Login error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withInput($request->only('email'))->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi.');
         }
     }
 

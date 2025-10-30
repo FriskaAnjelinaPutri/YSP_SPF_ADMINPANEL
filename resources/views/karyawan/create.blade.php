@@ -255,7 +255,7 @@
                             <label for="status_kode" class="form-label fw-semibold">Status</label>
                             <select class="form-select" id="status_kode" name="status_kode">
                                 <option value="">-- Pilih --</option>
-                                {!! selectOption($golongans, 'status_kode', 'status_kode', 'status_nama') !!}
+                                {!! selectOption($statuses, 'status_kode', 'status_kode', 'status_nama') !!}
                             </select>
                         </div>
 

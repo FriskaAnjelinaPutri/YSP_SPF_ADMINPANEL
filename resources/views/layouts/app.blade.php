@@ -12,6 +12,8 @@
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -195,6 +197,12 @@
                     <a href="{{ route('karyawan.index') }}" class="nav-link {{ request()->routeIs('karyawan.*') ? 'active' : '' }}">
                         <i class="bi bi-people"></i>
                         <span>Employees</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('jadwal.index') }}" class="nav-link {{ request()->routeIs('jadwal.*') ? 'active' : '' }}">
+                        <i class="bi bi-clock"></i>
+                        <span>Jadwal Kerja</span>
                     </a>
                 </li>
                 <li class="nav-item">
