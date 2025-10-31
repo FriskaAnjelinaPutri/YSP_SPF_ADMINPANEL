@@ -3,6 +3,7 @@
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PolaController;
+use App\Http\Controllers\TipeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\AbsensiController;
@@ -45,4 +46,13 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/pola/{kode}/edit', [PolaController::class, 'edit'])->name('pola.edit');
     Route::put('/pola/{kode}', [PolaController::class, 'update'])->name('pola.update');
     Route::delete('/pola/{kode}', [PolaController::class, 'destroy'])->name('pola.destroy');
+
+    // Manajemen Tipe
+    Route::get('/tipe', [TipeController::class, 'index'])->name('tipe.index');
+    Route::get('/tipe/create', [TipeController::class, 'create'])->name('tipe.create');
+    Route::post('/tipe', [TipeController::class, 'store'])->name('tipe.store');
+    Route::get('/tipe/{kode}', [TipeController::class, 'show'])->name('tipe.show');
+    Route::get('/tipe/{kode}/edit', [TipeController::class, 'edit'])->name('tipe.edit');
+    Route::put('/tipe/{kode}', [TipeController::class, 'update'])->name('tipe.update');
+    Route::delete('/tipe/{kode}', [TipeController::class, 'destroy'])->name('tipe.destroy');
 });
