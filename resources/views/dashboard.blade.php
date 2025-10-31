@@ -108,6 +108,16 @@
             </a>
         </div>
         <div class="col-6 col-md-3">
+            <a href="{{ route('tipe.index') }}" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+                <div class="card-body p-4">
+                    <div class="bg-sp-primary text-white rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-people fs-3"></i>
+                    </div>
+                    <h6 class="fw-semibold">Tipe Shift</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
             <a href="#" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
                 <div class="card-body p-4">
                     <div class="bg-sp-success text-white rounded-circle d-inline-flex p-3 mb-3">
