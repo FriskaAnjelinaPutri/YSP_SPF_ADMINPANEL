@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
-class AbsensiController extends Controller
+class LemburController extends Controller
 {
     private function apiBase()
     {
@@ -21,7 +21,7 @@ class AbsensiController extends Controller
     }
 
     /**
-     * Display a listing of absensi
+     * Display a listing of lembur
      */
     public function index(Request $request)
     {
@@ -31,11 +31,15 @@ class AbsensiController extends Controller
 
         try {
             $periode = $request->get('periode', Carbon::now()->format('Y-m'));
+            $status = $request->get('status');
             $karyawanId = $request->get('karyawan_id');
 
-            $url = $this->apiBase() . '/admin/absensi';
+            $url = $this->apiBase() . '/admin/lembur';
             $params = ['periode' => $periode];
 
+            if ($status) {
+                $params['status'] = $status;
+            }
             if ($karyawanId) {
                 $params['karyawan_id'] = $karyawanId;
             }
@@ -45,16 +49,16 @@ class AbsensiController extends Controller
                 ->get($url, $params);
 
             if ($response->failed()) {
-                Log::error('Gagal mengambil data absensi', ['body' => $response->body()]);
-                return view('absensi.index', [
-                    'absensis' => [],
+                Log::error('Gagal mengambil data lembur', ['body' => $response->body()]);
+                return view('lembur.index', [
+                    'lemburs' => [],
                     'periode' => $periode,
-                    'error' => 'Gagal mengambil data absensi dari API',
+                    'error' => 'Gagal mengambil data lembur dari API',
                 ]);
             }
 
             $data = $response->json();
-            $absensis = $data['data'] ?? [];
+            $lemburs = $data['data'] ?? [];
             $summary = $data['summary'] ?? [];
 
             // Get list karyawan untuk filter
@@ -65,12 +69,12 @@ class AbsensiController extends Controller
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
 
-            return view('absensi.index', compact('absensis', 'periode', 'summary', 'karyawans'));
+            return view('lembur.index', compact('lemburs', 'periode', 'summary', 'karyawans', 'status'));
 
         } catch (\Exception $e) {
-            Log::error('Error saat mengambil data absensi', ['error' => $e->getMessage()]);
-            return view('absensi.index', [
-                'absensis' => [],
+            Log::error('Error saat mengambil data lembur', ['error' => $e->getMessage()]);
+            return view('lembur.index', [
+                'lemburs' => [],
                 'periode' => Carbon::now()->format('Y-m'),
                 'error' => 'Terjadi kesalahan saat mengambil data',
             ]);
@@ -78,7 +82,7 @@ class AbsensiController extends Controller
     }
 
     /**
-     * Show the form for creating a new absensi
+     * Show the form for creating a new lembur
      */
     public function create()
     {
@@ -95,17 +99,17 @@ class AbsensiController extends Controller
             $karyawans = $response->successful() ?
                 ($response->json()['data'] ?? []) : [];
 
-            return view('absensi.create', compact('karyawans'));
+            return view('lembur.create', compact('karyawans'));
 
         } catch (\Exception $e) {
-            Log::error('Error saat load form create absensi', ['error' => $e->getMessage()]);
-            return redirect()->route('absensi.index')
+            Log::error('Error saat load form create lembur', ['error' => $e->getMessage()]);
+            return redirect()->route('lembur.index')
                 ->with('error', 'Terjadi kesalahan saat memuat form');
         }
     }
 
     /**
-     * Store a newly created absensi
+     * Store a newly created lembur
      */
     public function store(Request $request)
     {
@@ -116,44 +120,42 @@ class AbsensiController extends Controller
         $request->validate([
             'karyawan_id' => 'required|integer',
             'tanggal' => 'required|date',
-            'check_in' => 'required|date_format:H:i',
-            'check_out' => 'nullable|date_format:H:i',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'status' => 'required|in:Hadir,Terlambat,Izin,Sakit,Alpha',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i',
+            'alasan' => 'required|string|max:500',
+            'status' => 'required|in:Pending,Approved,Rejected',
             'keterangan' => 'nullable|string|max:500'
         ]);
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->post($this->apiBase() . '/admin/absensi', [
+                ->post($this->apiBase() . '/admin/lembur', [
                     'karyawan_id' => $request->karyawan_id,
                     'tanggal' => $request->tanggal,
-                    'check_in' => $request->check_in . ':00',
-                    'check_out' => $request->check_out ? $request->check_out . ':00' : null,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
+                    'jam_mulai' => $request->jam_mulai . ':00',
+                    'jam_selesai' => $request->jam_selesai . ':00',
+                    'alasan' => $request->alasan,
                     'status' => $request->status,
                     'keterangan' => $request->keterangan,
                 ]);
 
             if ($response->successful()) {
-                return redirect()->route('absensi.index')
-                    ->with('success', 'Data absensi berhasil ditambahkan');
+                return redirect()->route('lembur.index')
+                    ->with('success', 'Data lembur berhasil ditambahkan');
             }
 
-            $error = $response->json()['message'] ?? 'Gagal menyimpan data absensi';
+            $error = $response->json()['message'] ?? 'Gagal menyimpan data lembur';
             return back()->withInput()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat menyimpan absensi', ['error' => $e->getMessage()]);
+            Log::error('Error saat menyimpan lembur', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data');
         }
     }
 
     /**
-     * Display the specified absensi
+     * Display the specified lembur
      */
     public function show($id)
     {
@@ -164,25 +166,25 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/' . $id);
+                ->get($this->apiBase() . '/admin/lembur/' . $id);
 
             if ($response->successful()) {
-                $absensi = $response->json()['data'] ?? null;
-                return view('absensi.show', compact('absensi'));
+                $lembur = $response->json()['data'] ?? null;
+                return view('lembur.show', compact('lembur'));
             }
 
-            return redirect()->route('absensi.index')
-                ->with('error', 'Data absensi tidak ditemukan');
+            return redirect()->route('lembur.index')
+                ->with('error', 'Data lembur tidak ditemukan');
 
         } catch (\Exception $e) {
-            Log::error('Error saat mengambil detail absensi', ['error' => $e->getMessage()]);
-            return redirect()->route('absensi.index')
+            Log::error('Error saat mengambil detail lembur', ['error' => $e->getMessage()]);
+            return redirect()->route('lembur.index')
                 ->with('error', 'Terjadi kesalahan saat mengambil data');
         }
     }
 
     /**
-     * Show the form for editing the specified absensi
+     * Show the form for editing the specified lembur
      */
     public function edit($id)
     {
@@ -193,14 +195,14 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/' . $id);
+                ->get($this->apiBase() . '/admin/lembur/' . $id);
 
             if ($response->failed()) {
-                return redirect()->route('absensi.index')
-                    ->with('error', 'Data absensi tidak ditemukan');
+                return redirect()->route('lembur.index')
+                    ->with('error', 'Data lembur tidak ditemukan');
             }
 
-            $absensi = $response->json()['data'] ?? null;
+            $lembur = $response->json()['data'] ?? null;
 
             // Get list karyawan
             $karyawanResponse = Http::withToken($this->token())
@@ -210,17 +212,17 @@ class AbsensiController extends Controller
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
 
-            return view('absensi.edit', compact('absensi', 'karyawans'));
+            return view('lembur.edit', compact('lembur', 'karyawans'));
 
         } catch (\Exception $e) {
-            Log::error('Error saat mengambil data absensi untuk edit', ['error' => $e->getMessage()]);
-            return redirect()->route('absensi.index')
+            Log::error('Error saat mengambil data lembur untuk edit', ['error' => $e->getMessage()]);
+            return redirect()->route('lembur.index')
                 ->with('error', 'Terjadi kesalahan saat mengambil data');
         }
     }
 
     /**
-     * Update the specified absensi
+     * Update the specified lembur
      */
     public function update(Request $request, $id)
     {
@@ -229,42 +231,42 @@ class AbsensiController extends Controller
         }
 
         $request->validate([
-            'check_in' => 'required|date_format:H:i',
-            'check_out' => 'nullable|date_format:H:i',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'status' => 'required|in:Hadir,Terlambat,Izin,Sakit,Alpha',
+            'tanggal' => 'required|date',
+            'jam_mulai' => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i',
+            'alasan' => 'required|string|max:500',
+            'status' => 'required|in:Pending,Approved,Rejected',
             'keterangan' => 'nullable|string|max:500'
         ]);
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->put($this->apiBase() . '/admin/absensi/' . $id, [
-                    'check_in' => $request->check_in . ':00',
-                    'check_out' => $request->check_out ? $request->check_out . ':00' : null,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
+                ->put($this->apiBase() . '/admin/lembur/' . $id, [
+                    'tanggal' => $request->tanggal,
+                    'jam_mulai' => $request->jam_mulai . ':00',
+                    'jam_selesai' => $request->jam_selesai . ':00',
+                    'alasan' => $request->alasan,
                     'status' => $request->status,
                     'keterangan' => $request->keterangan,
                 ]);
 
             if ($response->successful()) {
-                return redirect()->route('absensi.index')
-                    ->with('success', 'Data absensi berhasil diperbarui');
+                return redirect()->route('lembur.index')
+                    ->with('success', 'Data lembur berhasil diperbarui');
             }
 
-            $error = $response->json()['message'] ?? 'Gagal memperbarui data absensi';
+            $error = $response->json()['message'] ?? 'Gagal memperbarui data lembur';
             return back()->withInput()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat update absensi', ['error' => $e->getMessage()]);
+            Log::error('Error saat update lembur', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data');
         }
     }
 
     /**
-     * Remove the specified absensi
+     * Remove the specified lembur
      */
     public function destroy($id)
     {
@@ -275,52 +277,82 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->delete($this->apiBase() . '/admin/absensi/' . $id);
+                ->delete($this->apiBase() . '/admin/lembur/' . $id);
 
             if ($response->successful()) {
-                return redirect()->route('absensi.index')
-                    ->with('success', 'Data absensi berhasil dihapus');
+                return redirect()->route('lembur.index')
+                    ->with('success', 'Data lembur berhasil dihapus');
             }
 
-            $error = $response->json()['message'] ?? 'Gagal menghapus data absensi';
+            $error = $response->json()['message'] ?? 'Gagal menghapus data lembur';
             return back()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat menghapus absensi', ['error' => $e->getMessage()]);
+            Log::error('Error saat menghapus lembur', ['error' => $e->getMessage()]);
             return back()->with('error', 'Terjadi kesalahan saat menghapus data');
         }
     }
 
     /**
-     * Export absensi to Excel
+     * Approve lembur
      */
-    public function export(Request $request)
+    public function approve($id)
     {
         if (!$this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
-            $periode = $request->get('periode', Carbon::now()->format('Y-m'));
-
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/export', [
-                    'periode' => $periode
+                ->post($this->apiBase() . '/admin/lembur/approve', [
+                    'id' => $id,
+                    'status' => 'Approved'
                 ]);
 
             if ($response->successful()) {
-                $filename = 'absensi_' . $periode . '.xlsx';
-                return response($response->body())
-                    ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                return redirect()->route('lembur.index')
+                    ->with('success', 'Lembur berhasil disetujui');
             }
 
-            return back()->with('error', 'Gagal mengexport data absensi');
+            $error = $response->json()['message'] ?? 'Gagal menyetujui lembur';
+            return back()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat export absensi', ['error' => $e->getMessage()]);
-            return back()->with('error', 'Terjadi kesalahan saat export data');
+            Log::error('Error saat approve lembur', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Terjadi kesalahan saat memproses approval');
+        }
+    }
+
+    /**
+     * Reject lembur
+     */
+    public function reject(Request $request, $id)
+    {
+        if (!$this->token()) {
+            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
+        }
+
+        try {
+            $response = Http::withToken($this->token())
+                ->acceptJson()
+                ->post($this->apiBase() . '/admin/lembur/approve', [
+                    'id' => $id,
+                    'status' => 'Rejected',
+                    'keterangan' => $request->keterangan
+                ]);
+
+            if ($response->successful()) {
+                return redirect()->route('lembur.index')
+                    ->with('success', 'Lembur berhasil ditolak');
+            }
+
+            $error = $response->json()['message'] ?? 'Gagal menolak lembur';
+            return back()->with('error', $error);
+
+        } catch (\Exception $e) {
+            Log::error('Error saat reject lembur', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Terjadi kesalahan saat memproses penolakan');
         }
     }
 }

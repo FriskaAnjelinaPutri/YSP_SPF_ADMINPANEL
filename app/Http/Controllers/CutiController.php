@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
-class AbsensiController extends Controller
+class CutiController extends Controller
 {
     private function apiBase()
     {
@@ -21,7 +21,7 @@ class AbsensiController extends Controller
     }
 
     /**
-     * Display a listing of absensi
+     * Display a listing of cuti
      */
     public function index(Request $request)
     {
@@ -31,11 +31,15 @@ class AbsensiController extends Controller
 
         try {
             $periode = $request->get('periode', Carbon::now()->format('Y-m'));
+            $status = $request->get('status');
             $karyawanId = $request->get('karyawan_id');
 
-            $url = $this->apiBase() . '/admin/absensi';
+            $url = $this->apiBase() . '/admin/cuti';
             $params = ['periode' => $periode];
 
+            if ($status) {
+                $params['status'] = $status;
+            }
             if ($karyawanId) {
                 $params['karyawan_id'] = $karyawanId;
             }
@@ -45,16 +49,16 @@ class AbsensiController extends Controller
                 ->get($url, $params);
 
             if ($response->failed()) {
-                Log::error('Gagal mengambil data absensi', ['body' => $response->body()]);
-                return view('absensi.index', [
-                    'absensis' => [],
+                Log::error('Gagal mengambil data cuti', ['body' => $response->body()]);
+                return view('cuti.index', [
+                    'cutis' => [],
                     'periode' => $periode,
-                    'error' => 'Gagal mengambil data absensi dari API',
+                    'error' => 'Gagal mengambil data cuti dari API',
                 ]);
             }
 
             $data = $response->json();
-            $absensis = $data['data'] ?? [];
+            $cutis = $data['data'] ?? [];
             $summary = $data['summary'] ?? [];
 
             // Get list karyawan untuk filter
@@ -65,12 +69,12 @@ class AbsensiController extends Controller
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
 
-            return view('absensi.index', compact('absensis', 'periode', 'summary', 'karyawans'));
+            return view('cuti.index', compact('cutis', 'periode', 'summary', 'karyawans', 'status'));
 
         } catch (\Exception $e) {
-            Log::error('Error saat mengambil data absensi', ['error' => $e->getMessage()]);
-            return view('absensi.index', [
-                'absensis' => [],
+            Log::error('Error saat mengambil data cuti', ['error' => $e->getMessage()]);
+            return view('cuti.index', [
+                'cutis' => [],
                 'periode' => Carbon::now()->format('Y-m'),
                 'error' => 'Terjadi kesalahan saat mengambil data',
             ]);
@@ -78,7 +82,7 @@ class AbsensiController extends Controller
     }
 
     /**
-     * Show the form for creating a new absensi
+     * Show the form for creating a new cuti
      */
     public function create()
     {
@@ -95,17 +99,17 @@ class AbsensiController extends Controller
             $karyawans = $response->successful() ?
                 ($response->json()['data'] ?? []) : [];
 
-            return view('absensi.create', compact('karyawans'));
+            return view('cuti.create', compact('karyawans'));
 
         } catch (\Exception $e) {
-            Log::error('Error saat load form create absensi', ['error' => $e->getMessage()]);
-            return redirect()->route('absensi.index')
+            Log::error('Error saat load form create cuti', ['error' => $e->getMessage()]);
+            return redirect()->route('cuti.index')
                 ->with('error', 'Terjadi kesalahan saat memuat form');
         }
     }
 
     /**
-     * Store a newly created absensi
+     * Store a newly created cuti
      */
     public function store(Request $request)
     {
@@ -115,45 +119,35 @@ class AbsensiController extends Controller
 
         $request->validate([
             'karyawan_id' => 'required|integer',
-            'tanggal' => 'required|date',
-            'check_in' => 'required|date_format:H:i',
-            'check_out' => 'nullable|date_format:H:i',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'status' => 'required|in:Hadir,Terlambat,Izin,Sakit,Alpha',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'jenis_cuti' => 'required|in:Tahunan,Sakit,Melahirkan,Menikah,Keluarga Meninggal,Lainnya',
+            'alasan' => 'required|string|max:500',
+            'status' => 'required|in:Pending,Approved,Rejected',
             'keterangan' => 'nullable|string|max:500'
         ]);
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->post($this->apiBase() . '/admin/absensi', [
-                    'karyawan_id' => $request->karyawan_id,
-                    'tanggal' => $request->tanggal,
-                    'check_in' => $request->check_in . ':00',
-                    'check_out' => $request->check_out ? $request->check_out . ':00' : null,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'status' => $request->status,
-                    'keterangan' => $request->keterangan,
-                ]);
+                ->post($this->apiBase() . '/admin/cuti', $request->all());
 
             if ($response->successful()) {
-                return redirect()->route('absensi.index')
-                    ->with('success', 'Data absensi berhasil ditambahkan');
+                return redirect()->route('cuti.index')
+                    ->with('success', 'Data cuti berhasil ditambahkan');
             }
 
-            $error = $response->json()['message'] ?? 'Gagal menyimpan data absensi';
+            $error = $response->json()['message'] ?? 'Gagal menyimpan data cuti';
             return back()->withInput()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat menyimpan absensi', ['error' => $e->getMessage()]);
+            Log::error('Error saat menyimpan cuti', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data');
         }
     }
 
     /**
-     * Display the specified absensi
+     * Display the specified cuti
      */
     public function show($id)
     {
@@ -164,25 +158,25 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/' . $id);
+                ->get($this->apiBase() . '/admin/cuti/' . $id);
 
             if ($response->successful()) {
-                $absensi = $response->json()['data'] ?? null;
-                return view('absensi.show', compact('absensi'));
+                $cuti = $response->json()['data'] ?? null;
+                return view('cuti.show', compact('cuti'));
             }
 
-            return redirect()->route('absensi.index')
-                ->with('error', 'Data absensi tidak ditemukan');
+            return redirect()->route('cuti.index')
+                ->with('error', 'Data cuti tidak ditemukan');
 
         } catch (\Exception $e) {
-            Log::error('Error saat mengambil detail absensi', ['error' => $e->getMessage()]);
-            return redirect()->route('absensi.index')
+            Log::error('Error saat mengambil detail cuti', ['error' => $e->getMessage()]);
+            return redirect()->route('cuti.index')
                 ->with('error', 'Terjadi kesalahan saat mengambil data');
         }
     }
 
     /**
-     * Show the form for editing the specified absensi
+     * Show the form for editing the specified cuti
      */
     public function edit($id)
     {
@@ -193,14 +187,14 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/' . $id);
+                ->get($this->apiBase() . '/admin/cuti/' . $id);
 
             if ($response->failed()) {
-                return redirect()->route('absensi.index')
-                    ->with('error', 'Data absensi tidak ditemukan');
+                return redirect()->route('cuti.index')
+                    ->with('error', 'Data cuti tidak ditemukan');
             }
 
-            $absensi = $response->json()['data'] ?? null;
+            $cuti = $response->json()['data'] ?? null;
 
             // Get list karyawan
             $karyawanResponse = Http::withToken($this->token())
@@ -210,17 +204,17 @@ class AbsensiController extends Controller
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
 
-            return view('absensi.edit', compact('absensi', 'karyawans'));
+            return view('cuti.edit', compact('cuti', 'karyawans'));
 
         } catch (\Exception $e) {
-            Log::error('Error saat mengambil data absensi untuk edit', ['error' => $e->getMessage()]);
-            return redirect()->route('absensi.index')
+            Log::error('Error saat mengambil data cuti untuk edit', ['error' => $e->getMessage()]);
+            return redirect()->route('cuti.index')
                 ->with('error', 'Terjadi kesalahan saat mengambil data');
         }
     }
 
     /**
-     * Update the specified absensi
+     * Update the specified cuti
      */
     public function update(Request $request, $id)
     {
@@ -229,42 +223,42 @@ class AbsensiController extends Controller
         }
 
         $request->validate([
-            'check_in' => 'required|date_format:H:i',
-            'check_out' => 'nullable|date_format:H:i',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'status' => 'required|in:Hadir,Terlambat,Izin,Sakit,Alpha',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'jenis_cuti' => 'required|in:Tahunan,Sakit,Melahirkan,Menikah,Keluarga Meninggal,Lainnya',
+            'alasan' => 'required|string|max:500',
+            'status' => 'required|in:Pending,Approved,Rejected',
             'keterangan' => 'nullable|string|max:500'
         ]);
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->put($this->apiBase() . '/admin/absensi/' . $id, [
-                    'check_in' => $request->check_in . ':00',
-                    'check_out' => $request->check_out ? $request->check_out . ':00' : null,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
+                ->put($this->apiBase() . '/admin/cuti/' . $id, [
+                    'tanggal_mulai' => $request->tanggal_mulai,
+                    'tanggal_selesai' => $request->tanggal_selesai,
+                    'jenis_cuti' => $request->jenis_cuti,
+                    'alasan' => $request->alasan,
                     'status' => $request->status,
                     'keterangan' => $request->keterangan,
                 ]);
 
             if ($response->successful()) {
-                return redirect()->route('absensi.index')
-                    ->with('success', 'Data absensi berhasil diperbarui');
+                return redirect()->route('cuti.index')
+                    ->with('success', 'Data cuti berhasil diperbarui');
             }
 
-            $error = $response->json()['message'] ?? 'Gagal memperbarui data absensi';
+            $error = $response->json()['message'] ?? 'Gagal memperbarui data cuti';
             return back()->withInput()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat update absensi', ['error' => $e->getMessage()]);
+            Log::error('Error saat update cuti', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data');
         }
     }
 
     /**
-     * Remove the specified absensi
+     * Remove the specified cuti
      */
     public function destroy($id)
     {
@@ -275,52 +269,82 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->delete($this->apiBase() . '/admin/absensi/' . $id);
+                ->delete($this->apiBase() . '/admin/cuti/' . $id);
 
             if ($response->successful()) {
-                return redirect()->route('absensi.index')
-                    ->with('success', 'Data absensi berhasil dihapus');
+                return redirect()->route('cuti.index')
+                    ->with('success', 'Data cuti berhasil dihapus');
             }
 
-            $error = $response->json()['message'] ?? 'Gagal menghapus data absensi';
+            $error = $response->json()['message'] ?? 'Gagal menghapus data cuti';
             return back()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat menghapus absensi', ['error' => $e->getMessage()]);
+            Log::error('Error saat menghapus cuti', ['error' => $e->getMessage()]);
             return back()->with('error', 'Terjadi kesalahan saat menghapus data');
         }
     }
 
     /**
-     * Export absensi to Excel
+     * Approve cuti
      */
-    public function export(Request $request)
+    public function approve($id)
     {
         if (!$this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
-            $periode = $request->get('periode', Carbon::now()->format('Y-m'));
-
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/export', [
-                    'periode' => $periode
+                ->post($this->apiBase() . '/admin/cuti/approve', [
+                    'id' => $id,
+                    'status' => 'Approved'
                 ]);
 
             if ($response->successful()) {
-                $filename = 'absensi_' . $periode . '.xlsx';
-                return response($response->body())
-                    ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                return redirect()->route('cuti.index')
+                    ->with('success', 'Cuti berhasil disetujui');
             }
 
-            return back()->with('error', 'Gagal mengexport data absensi');
+            $error = $response->json()['message'] ?? 'Gagal menyetujui cuti';
+            return back()->with('error', $error);
 
         } catch (\Exception $e) {
-            Log::error('Error saat export absensi', ['error' => $e->getMessage()]);
-            return back()->with('error', 'Terjadi kesalahan saat export data');
+            Log::error('Error saat approve cuti', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Terjadi kesalahan saat memproses approval');
+        }
+    }
+
+    /**
+     * Reject cuti
+     */
+    public function reject(Request $request, $id)
+    {
+        if (!$this->token()) {
+            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
+        }
+
+        try {
+            $response = Http::withToken($this->token())
+                ->acceptJson()
+                ->post($this->apiBase() . '/admin/cuti/approve', [
+                    'id' => $id,
+                    'status' => 'Rejected',
+                    'keterangan' => $request->keterangan
+                ]);
+
+            if ($response->successful()) {
+                return redirect()->route('cuti.index')
+                    ->with('success', 'Cuti berhasil ditolak');
+            }
+
+            $error = $response->json()['message'] ?? 'Gagal menolak cuti';
+            return back()->with('error', $error);
+
+        } catch (\Exception $e) {
+            Log::error('Error saat reject cuti', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Terjadi kesalahan saat memproses penolakan');
         }
     }
 }
