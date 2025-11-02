@@ -2,10 +2,12 @@
 
 use App\Http\Middleware\AdminAuth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CutiController;
 use App\Http\Controllers\PolaController;
 use App\Http\Controllers\TipeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\LemburController;
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\AdminAuthController;
@@ -21,6 +23,20 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+    // Absensi Management
+    Route::resource('absensi', AbsensiController::class);
+    Route::get('/absensi/export', [AbsensiController::class, 'export'])->name('absensi.export');
+
+    // Cuti Management
+    Route::resource('cuti', CutiController::class);
+    Route::post('/cuti/{id}/approve', [CutiController::class, 'approve'])->name('cuti.approve');
+    Route::post('/cuti/{id}/reject', [CutiController::class, 'reject'])->name('cuti.reject');
+
+    // Lembur Management
+    Route::resource('lembur', LemburController::class);
+    Route::post('/lembur/{id}/approve', [LemburController::class, 'approve'])->name('lembur.approve');
+    Route::post('/lembur/{id}/reject', [LemburController::class, 'reject'])->name('lembur.reject');
+
     // Manajemen Karyawan
     Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan.index');
     Route::get('/karyawan/create', [KaryawanController::class, 'create'])->name('karyawan.create');
@@ -28,8 +44,6 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/karyawan/{id}/edit', [KaryawanController::class, 'edit'])->name('karyawan.edit');
     Route::put('/karyawan/{id}', [KaryawanController::class, 'update'])->name('karyawan.update');
     Route::delete('/karyawan/{id}', [KaryawanController::class, 'destroy'])->name('karyawan.destroy');
-
-    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
 
     // Manajemen Jadwal
     Route::get('/jadwal', [JadwalController::class, 'index'])->name('jadwal.index');
