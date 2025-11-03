@@ -3,69 +3,75 @@
 @section('title', 'Dashboard - Semen Padang Hospital')
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 px-5">
 
-    {{-- ================= CUSTOM STYLES ================= --}}
+    {{-- ================= CUSTOM STYLES (Modern Green Theme) ================= --}}
     <style>
         body {
-            background-color: #f8fafc;
+            background-color: #f0fdf4; /* Light green background */
             font-family: 'Poppins', sans-serif;
         }
 
+        .dashboard-title {
+            color: #166534; /* Darker green for titles */
+        }
+
         .card {
-            border-radius: 20px;
+            border-radius: 1rem;
             border: none;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
         .card-header {
-            border-top-left-radius: 20px !important;
-            border-top-right-radius: 20px !important;
+            background-color: transparent;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            color: #1f2937;
+            padding: 1.25rem;
         }
 
-        .shadow-soft {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        .shortcut-card .icon-bg {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #dcfce7; /* Light green for icon background */
+            color: #22c55e; /* Main green for icon */
+            font-size: 1.75rem;
+            transition: all 0.3s ease;
         }
 
-        .dashboard-title {
-            color: #006d77;
+        .shortcut-card:hover .icon-bg {
+            transform: scale(1.1);
         }
 
-        .shortcut-card {
-            transition: all 0.25s ease-in-out;
-            border: none;
-        }
-
-        .shortcut-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .bg-sp-primary { background-color: #118ab2 !important; }
-        .bg-sp-success { background-color: #06d6a0 !important; }
-        .bg-sp-warning { background-color: #ffd166 !important; color: #333 !important; }
-        .bg-sp-danger  { background-color: #ef476f !important; }
-
-        .no-data {
-            text-align: center;
-            color: #6c757d;
-            padding: 20px 0;
-        }
-
-        .no-data i {
-            font-size: 2rem;
-            display: block;
-            margin-bottom: 8px;
-            color: #adb5bd;
-        }
-
-        /* Card hover effect for info cards */
         .info-card {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            padding: 1.5rem;
         }
 
-        .info-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        .info-card .icon {
+            font-size: 2rem;
+            color: #16a34a; /* Accent green */
+        }
+
+        .info-card h2 {
+            color: #166534;
+        }
+
+        .badge-custom {
+            background-color: #dcfce7;
+            color: #166534;
+            font-weight: 500;
+            padding: 0.5em 0.75em;
         }
 
         /* Chart responsiveness */
@@ -75,7 +81,7 @@
     </style>
 
     {{-- ================= GREETING ================= --}}
-    <div class="mb-4">
+    <div class="mb-8">
         @php
             $hour = now()->format('H');
             if ($hour < 12) {
@@ -88,167 +94,184 @@
             $adminName = session('user')['name'] ?? 'Admin';
         @endphp
 
-        <h4 class="fw-bold dashboard-title">{{ $greeting }}, {{ $adminName }} 👋</h4>
-        <p class="text-muted">Welcome back to <strong>Semen Padang Hospital</strong> attendance dashboard.</p>
-    </div>
-
-    {{-- ================= SHORTCUT MENU ================= --}}
-    <div class="row g-3 mb-4 text-center">
-        <div class="col-6 col-md-3">
-            <a href="{{ route('karyawan.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
-                <div class="card-body p-4">
-                    <div class="bg-sp-primary text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-people fs-3"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Employees</h6>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-md-3">
-            <a href="{{ route('jadwal.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
-                <div class="card-body p-4">
-                    <div class="bg-sp-success text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-calendar-week fs-3"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Jadwal Kerja</h6>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-md-3">
-            <a href="{{ route('pola.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
-                <div class="card-body p-4">
-                    <div class="bg-sp-warning text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-clock fs-3"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Pola Jam Kerja</h6>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-md-3">
-            <a href="{{ route('tipe.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
-                <div class="card-body p-4">
-                    <div class="bg-sp-danger text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-grid fs-3"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Tipe Shift</h6>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-md-3">
-            <a href="#" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
-                <div class="card-body p-4">
-                    <div class="bg-sp-success text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-calendar-check fs-3"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Attendance</h6>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-md-3">
-            <a href="#" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
-                <div class="card-body p-4">
-                    <div class="bg-sp-warning text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-hourglass-split fs-3"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Overtime</h6>
-                </div>
-            </a>
-        </div>
-        <div class="col-6 col-md-3">
-            <a href="#" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
-                <div class="card-body p-4">
-                    <div class="bg-sp-danger text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-calendar-x fs-3"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Leave</h6>
-                </div>
-            </a>
-        </div>
+        <h2 class="fw-bold dashboard-title">{{ $greeting }}, {{ $adminName }} 👋</h2>
+        <p class="text-muted">Welcome back! Here's a quick overview of the attendance at <strong>Semen Padang Hospital</strong>.</p>
     </div>
 
     {{-- ================= INFO CARDS ================= --}}
-    <div class="row g-3 mb-4">
-        <div class="col-md-3 col-6">
-            <div class="card bg-sp-primary text-white shadow-soft info-card h-100">
-                <div class="card-body text-center">
-                    <h6>Total Employees</h6>
-                    <h2 class="fw-bold mb-0">{{ $totalKaryawan ?? 0 }}</h2>
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="card info-card h-100">
+                <div class="d-flex align-items-center">
+                    <div class="icon me-3">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Total Employees</h6>
+                        <h2 class="fw-bold mb-0">{{ $totalKaryawan ?? 0 }}</h2>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-6">
-            <div class="card bg-sp-success text-white shadow-soft info-card h-100">
-                <div class="card-body text-center">
-                    <h6>Today’s Attendance</h6>
-                    <h2 class="fw-bold mb-0">{{ $absensiHariIni ?? 0 }}</h2>
+        <div class="col-lg-3 col-md-6">
+            <div class="card info-card h-100">
+                <div class="d-flex align-items-center">
+                    <div class="icon me-3">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Today’s Attendance</h6>
+                        <h2 class="fw-bold mb-0">{{ $absensiHariIni ?? 0 }}</h2>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-6">
-            <div class="card bg-sp-warning text-white shadow-soft info-card h-100">
-                <div class="card-body text-center">
-                    <h6>Overtime This Month</h6>
-                    <h2 class="fw-bold mb-0">{{ $totalLembur ?? 0 }}</h2>
+        <div class="col-lg-3 col-md-6">
+            <div class="card info-card h-100">
+                <div class="d-flex align-items-center">
+                    <div class="icon me-3">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Overtime This Month</h6>
+                        <h2 class="fw-bold mb-0">{{ $totalLembur ?? 0 }}</h2>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 col-6">
-            <div class="card bg-sp-danger text-white shadow-soft info-card h-100">
-                <div class="card-body text-center">
-                    <h6>Leave Requests</h6>
-                    <h2 class="fw-bold mb-0">{{ $totalCuti ?? 0 }}</h2>
+        <div class="col-lg-3 col-md-6">
+            <div class="card info-card h-100">
+                <div class="d-flex align-items-center">
+                    <div class="icon me-3">
+                        <i class="bi bi-calendar-x-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Leave Requests</h6>
+                        <h2 class="fw-bold mb-0">{{ $totalCuti ?? 0 }}</h2>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- ================= CHARTS ================= --}}
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-soft border-0 h-100">
-                <div class="card-header bg-white fw-semibold">
-                    <i class="bi bi-graph-up text-sp-primary me-2"></i> Attendance Statistics
+    {{-- ================= CHARTS & SHORTCUTS ================= --}}
+    <div class="row g-4 mb-5">
+        {{-- ================= CHARTS ================= --}}
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-graph-up-arrow me-2" style="color: #16a34a;"></i> Attendance Statistics
                 </div>
-                <div class="card-body">
-                    <canvas id="absensiChart" height="150"></canvas>
+                <div class="card-body d-flex align-items-center">
+                    <canvas id="absensiChart" height="250"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card shadow-soft border-0 h-100">
-                <div class="card-header bg-white fw-semibold">
-                    <i class="bi bi-bar-chart-line text-sp-warning me-2"></i> Overtime Statistics
+
+        {{-- ================= SHORTCUT MENU ================= --}}
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-grid-fill me-2" style="color: #16a34a;"></i> Quick Menu
                 </div>
                 <div class="card-body">
-                    <canvas id="lemburChart" height="150"></canvas>
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <a href="{{ route('karyawan.index') }}" class="text-decoration-none shortcut-card">
+                                <div class="icon-bg">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <p class="mt-2 mb-0 fw-semibold text-dark">Employees</p>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ route('jadwal.index') }}" class="text-decoration-none shortcut-card">
+                                <div class="icon-bg">
+                                    <i class="bi bi-calendar-week"></i>
+                                </div>
+                                <p class="mt-2 mb-0 fw-semibold text-dark">Jadwal</p>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ route('pola.index') }}" class="text-decoration-none shortcut-card">
+                                <div class="icon-bg">
+                                    <i class="bi bi-clock"></i>
+                                </div>
+                                <p class="mt-2 mb-0 fw-semibold text-dark">Pola Jam</p>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{{ route('tipe.index') }}" class="text-decoration-none shortcut-card">
+                                <div class="icon-bg">
+                                    <i class="bi bi-tags"></i>
+                                </div>
+                                <p class="mt-2 mb-0 fw-semibold text-dark">Tipe Shift</p>
+                            </a>
+                        </div>
+                         <div class="col-6">
+                            <a href="#" class="text-decoration-none shortcut-card">
+                                <div class="icon-bg">
+                                    <i class="bi bi-calendar-check"></i>
+                                </div>
+                                <p class="mt-2 mb-0 fw-semibold text-dark">Attendance</p>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#" class="text-decoration-none shortcut-card">
+                                <div class="icon-bg">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                                <p class="mt-2 mb-0 fw-semibold text-dark">Overtime</p>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     {{-- ================= LATEST EMPLOYEES ================= --}}
-    <div class="card shadow-soft border-0 mb-5">
-        <div class="card-header bg-white fw-semibold">
-            <i class="bi bi-person-lines-fill text-sp-primary me-2"></i> Latest Employees
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-person-lines-fill me-2" style="color: #16a34a;"></i> Latest Registered Employees
         </div>
         <div class="card-body">
-            @forelse($karyawanTerbaru ?? [] as $karyawan)
-                <div class="d-flex align-items-center border-bottom py-2">
-                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width:45px; height:45px;">
-                        <i class="bi bi-person fs-4 text-secondary"></i>
-                    </div>
-                    <div>
-                        <h6 class="mb-0">{{ $karyawan['kar_nama'] }}</h6>
-                        <small class="text-muted">{{ $karyawan['kar_email'] }}</small><br>
-                        <span class="badge bg-sp-primary">{{ $karyawan['jabatan_kode'] ?? 'N/A' }}</span>
-                    </div>
-                </div>
-            @empty
-                <div class="no-data">
-                    <i class="bi bi-emoji-frown"></i>
-                    <p>No data available</p>
-                </div>
-            @endforelse
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Position</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($karyawanTerbaru ?? [] as $karyawan)
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px;">
+                                            <i class="bi bi-person fs-5 text-secondary"></i>
+                                        </div>
+                                        <span class="fw-semibold">{{ $karyawan['kar_nama'] }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-muted">{{ $karyawan['kar_email'] }}</td>
+                                <td>
+                                    <span class="badge-custom">{{ $karyawan['jabatan_kode'] ?? 'N/A' }}</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">
+                                    <i class="bi bi-emoji-frown fs-3 d-block mb-2"></i>
+                                    No recent employees found.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -256,63 +279,52 @@
 {{-- ================= CHART JS ================= --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Attendance Chart
-    const absensiCtx = document.getElementById('absensiChart').getContext('2d');
-    new Chart(absensiCtx, {
-        type: 'line',
-        data: {
-            labels: @json($absensiLabels ?? []),
-            datasets: [{
-                label: 'Attendance',
-                data: @json($absensiData ?? []),
-                borderColor: '#118ab2',
-                backgroundColor: 'rgba(17,138,178,0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                duration: 1200,
-                easing: 'easeOutQuart'
-            },
-            plugins: {
-                legend: { display: true, position: 'bottom' }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-
-    // Overtime Chart
-    const lemburCtx = document.getElementById('lemburChart').getContext('2d');
-    new Chart(lemburCtx, {
-        type: 'bar',
-        data: {
-            labels: @json($lemburLabels ?? []),
-            datasets: [{
-                label: 'Overtime',
-                data: @json($lemburData ?? []),
-                backgroundColor: '#ffd166'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                duration: 1200,
-                easing: 'easeOutQuart'
-            },
-            plugins: {
-                legend: { display: true, position: 'bottom' }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
+    document.addEventListener("DOMContentLoaded", function() {
+        // Attendance Chart
+        const absensiCtx = document.getElementById('absensiChart');
+        if (absensiCtx) {
+            new Chart(absensiCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: @json($absensiLabels ?? []),
+                    datasets: [{
+                        label: 'Attendance',
+                        data: @json($absensiData ?? []),
+                        borderColor: '#22c55e', // Main green
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#22c55e',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e5e7eb'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
         }
     });
 </script>
