@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Semen Padang Hospital | Admin Panel</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('logo sph.png') }}">
+
     <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Font -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -38,7 +41,8 @@
             justify-content: space-between;
         }
 
-        .sidebar:hover {
+        .sidebar:hover,
+        .sidebar.active {
             width: 240px;
         }
 
@@ -52,7 +56,8 @@
             transition: opacity 0.3s;
         }
 
-        .sidebar:hover h5 {
+        .sidebar:hover h5,
+        .sidebar.active h5 {
             opacity: 1;
         }
 
@@ -63,7 +68,7 @@
             color: #cde3f5;
         }
 
-        /* Sidebar Navigation Links */
+        /* Sidebar Navigation */
         .sidebar .nav-link {
             color: #e9ecef;
             border-radius: 8px;
@@ -76,7 +81,8 @@
             justify-content: center;
         }
 
-        .sidebar:hover .nav-link {
+        .sidebar:hover .nav-link,
+        .sidebar.active .nav-link {
             justify-content: flex-start;
         }
 
@@ -86,7 +92,8 @@
             transition: margin 0.3s;
         }
 
-        .sidebar:hover .nav-link i {
+        .sidebar:hover .nav-link i,
+        .sidebar.active .nav-link i {
             margin-right: 12px;
         }
 
@@ -95,7 +102,8 @@
             transition: opacity 0.3s;
         }
 
-        .sidebar:hover .nav-link span {
+        .sidebar:hover .nav-link span,
+        .sidebar.active .nav-link span {
             display: inline;
         }
 
@@ -127,12 +135,14 @@
             display: none;
         }
 
-        .sidebar:hover .btn-logout {
+        .sidebar:hover .btn-logout,
+        .sidebar.active .btn-logout {
             width: calc(100% - 20px);
             justify-content: center;
         }
 
-        .sidebar:hover .btn-logout span {
+        .sidebar:hover .btn-logout span,
+        .sidebar.active .btn-logout span {
             display: inline;
         }
 
@@ -149,7 +159,8 @@
             min-height: 100vh;
         }
 
-        .sidebar:hover ~ .content {
+        .sidebar:hover ~ .content,
+        .sidebar.active ~ .content {
             margin-left: 240px;
             width: calc(100% - 240px);
         }
@@ -173,8 +184,45 @@
             color: #343a40;
         }
 
+        /* Toggle Button (Mobile) */
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #006d77;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Overlay for Mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -240px;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+        }
     </style>
 </head>
+
 <body>
 <div class="d-flex">
 
@@ -245,10 +293,16 @@
         </div>
     </nav>
 
+    <!-- Overlay (mobile only) -->
+    <div class="overlay" id="overlay"></div>
+
     <!-- Main Content -->
     <main class="content" id="content">
         <!-- Topbar -->
         <div class="topbar">
+            <button class="toggle-btn d-lg-none" id="toggleSidebar">
+                <i class="bi bi-list"></i>
+            </button>
             <div class="d-flex align-items-center user-info">
                 <i class="bi bi-person-circle me-2"></i>
                 <span>{{ session('user')['name'] ?? 'Admin' }}</span>
@@ -262,6 +316,24 @@
     </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Sidebar Toggle for Mobile
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const toggleBtn = document.getElementById('toggleSidebar');
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+</script>
 </body>
 </html>

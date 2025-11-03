@@ -9,52 +9,112 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     {{-- Google Fonts --}}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    {{-- Bootstrap Icons --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
+        /* ===========================
+           GLOBAL & BACKGROUND STYLING
+        ============================ */
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #e3f2fd, #ffffff);
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.8s ease-in-out;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Floating blurred background circles */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            animation: float 10s ease-in-out infinite alternate;
         }
 
+        .circle.one {
+            width: 350px;
+            height: 350px;
+            background: #90e0ef;
+            top: -80px;
+            left: -100px;
+        }
+
+        .circle.two {
+            width: 400px;
+            height: 400px;
+            background: #caf0f8;
+            bottom: -120px;
+            right: -120px;
+        }
+
+        @keyframes float {
+            from { transform: translateY(0); }
+            to { transform: translateY(30px); }
+        }
+
+        /* ===========================
+           LOGIN CARD STYLING
+        ============================ */
         .login-card {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             overflow: hidden;
             width: 100%;
             max-width: 420px;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .login-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-6px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
         }
 
+        /* ===========================
+           HEADER
+        ============================ */
         .card-header {
             background: linear-gradient(135deg, #0077b6, #00b4d8);
             text-align: center;
-            padding: 30px 20px;
+            padding: 40px 20px;
         }
 
         .card-header img {
-            width: 60px;
+            width: 70px;
             margin-bottom: 10px;
+            animation: bounce 3s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
         }
 
         .card-header h4 {
             color: #fff;
-            font-weight: 600;
-            margin-bottom: 0;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        /* ===========================
+           FORM STYLING
+        ============================ */
+        .card-body {
+            padding: 35px 30px;
         }
 
         .form-label {
@@ -63,54 +123,75 @@
         }
 
         .form-control {
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 10px 12px;
-            border: 1px solid #ced4da;
+            border: 1px solid #d0d0d0;
             transition: all 0.3s ease;
         }
 
         .form-control:focus {
             border-color: #00b4d8;
-            box-shadow: 0 0 5px rgba(0, 180, 216, 0.3);
+            box-shadow: 0 0 8px rgba(0, 180, 216, 0.4);
         }
 
         .input-group-text {
-            background-color: transparent;
-            border: 1px solid #ced4da;
+            background-color: #fff;
+            border: 1px solid #d0d0d0;
             border-left: none;
+            border-radius: 0 12px 12px 0;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
+        .input-group-text:hover {
+            background-color: #f1faff;
+            color: #00b4d8;
+        }
+
+        /* ===========================
+           BUTTON STYLING
+        ============================ */
         .btn-login {
             background: linear-gradient(135deg, #0077b6, #00b4d8);
             border: none;
             color: #fff;
             font-weight: 600;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 119, 182, 0.3);
             transition: all 0.3s ease;
         }
 
         .btn-login:hover {
             background: linear-gradient(135deg, #0096c7, #0077b6);
-            transform: scale(1.02);
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 119, 182, 0.4);
         }
 
+        /* ===========================
+           FOOTER TEXT
+        ============================ */
         .footer-text {
             text-align: center;
             font-size: 13px;
-            color: #777;
-            margin-top: 15px;
+            color: #555;
+            margin-top: 20px;
         }
 
         .alert {
             font-size: 14px;
-            border-radius: 10px;
+            border-radius: 12px;
         }
     </style>
 </head>
 <body>
 
+    <!-- Background floating shapes -->
+    <div class="circle one"></div>
+    <div class="circle two"></div>
+
+    <!-- Login card -->
     <div class="login-card">
         <div class="card-header">
             <img src="https://cdn-icons-png.flaticon.com/512/2966/2966487.png" alt="Hospital Icon">
@@ -164,7 +245,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-login w-100">Sign In</button>
+                <button type="submit" class="btn btn-login">Sign In</button>
             </form>
 
             <div class="footer-text mt-3">
@@ -173,11 +254,11 @@
         </div>
     </div>
 
-    {{-- Bootstrap JS & Icons --}}
+    {{-- Bootstrap JS --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <script>
+        // Show/Hide Password
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const icon = document.getElementById('toggleIcon');

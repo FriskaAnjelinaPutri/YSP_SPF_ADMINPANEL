@@ -3,9 +3,9 @@
 @section('title', 'Dashboard - Semen Padang Hospital')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
-    {{-- Custom Styles --}}
+    {{-- ================= CUSTOM STYLES ================= --}}
     <style>
         body {
             background-color: #f8fafc;
@@ -14,6 +14,7 @@
 
         .card {
             border-radius: 20px;
+            border: none;
         }
 
         .card-header {
@@ -22,7 +23,7 @@
         }
 
         .shadow-soft {
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
         }
 
         .dashboard-title {
@@ -30,12 +31,13 @@
         }
 
         .shortcut-card {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            transition: all 0.25s ease-in-out;
+            border: none;
         }
 
         .shortcut-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
         }
 
         .bg-sp-primary { background-color: #118ab2 !important; }
@@ -55,9 +57,24 @@
             margin-bottom: 8px;
             color: #adb5bd;
         }
+
+        /* Card hover effect for info cards */
+        .info-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Chart responsiveness */
+        canvas {
+            width: 100% !important;
+        }
     </style>
 
-    {{-- Greeting --}}
+    {{-- ================= GREETING ================= --}}
     <div class="mb-4">
         @php
             $hour = now()->format('H');
@@ -75,109 +92,109 @@
         <p class="text-muted">Welcome back to <strong>Semen Padang Hospital</strong> attendance dashboard.</p>
     </div>
 
-    {{-- Shortcut Menu --}}
+    {{-- ================= SHORTCUT MENU ================= --}}
     <div class="row g-3 mb-4 text-center">
         <div class="col-6 col-md-3">
-            <a href="{{ route('karyawan.index') }}" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+            <a href="{{ route('karyawan.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
                 <div class="card-body p-4">
                     <div class="bg-sp-primary text-white rounded-circle d-inline-flex p-3 mb-3">
                         <i class="bi bi-people fs-3"></i>
                     </div>
-                    <h6 class="fw-semibold">Employees</h6>
+                    <h6 class="fw-semibold mb-0">Employees</h6>
                 </div>
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <a href="{{ route('jadwal.index') }}" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+            <a href="{{ route('jadwal.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
                 <div class="card-body p-4">
-                    <div class="bg-sp-primary text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-people fs-3"></i>
+                    <div class="bg-sp-success text-white rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-calendar-week fs-3"></i>
                     </div>
-                    <h6 class="fw-semibold">Jadwal Kerja</h6>
+                    <h6 class="fw-semibold mb-0">Jadwal Kerja</h6>
                 </div>
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <a href="{{ route('pola.index') }}" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+            <a href="{{ route('pola.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
                 <div class="card-body p-4">
-                    <div class="bg-sp-primary text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-people fs-3"></i>
+                    <div class="bg-sp-warning text-white rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-clock fs-3"></i>
                     </div>
-                    <h6 class="fw-semibold">Pola Jam Kerja</h6>
+                    <h6 class="fw-semibold mb-0">Pola Jam Kerja</h6>
                 </div>
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <a href="{{ route('tipe.index') }}" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+            <a href="{{ route('tipe.index') }}" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
                 <div class="card-body p-4">
-                    <div class="bg-sp-primary text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-people fs-3"></i>
+                    <div class="bg-sp-danger text-white rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-grid fs-3"></i>
                     </div>
-                    <h6 class="fw-semibold">Tipe Shift</h6>
+                    <h6 class="fw-semibold mb-0">Tipe Shift</h6>
                 </div>
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <a href="#" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+            <a href="#" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
                 <div class="card-body p-4">
                     <div class="bg-sp-success text-white rounded-circle d-inline-flex p-3 mb-3">
                         <i class="bi bi-calendar-check fs-3"></i>
                     </div>
-                    <h6 class="fw-semibold">Attendance</h6>
+                    <h6 class="fw-semibold mb-0">Attendance</h6>
                 </div>
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <a href="#" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+            <a href="#" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
                 <div class="card-body p-4">
                     <div class="bg-sp-warning text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-clock-history fs-3"></i>
+                        <i class="bi bi-hourglass-split fs-3"></i>
                     </div>
-                    <h6 class="fw-semibold">Overtime</h6>
+                    <h6 class="fw-semibold mb-0">Overtime</h6>
                 </div>
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <a href="#" class="card shadow-soft border-0 text-decoration-none text-dark h-100 shortcut-card">
+            <a href="#" class="card shortcut-card shadow-soft text-decoration-none text-dark h-100">
                 <div class="card-body p-4">
                     <div class="bg-sp-danger text-white rounded-circle d-inline-flex p-3 mb-3">
-                        <i class="bi bi-calendar-event fs-3"></i>
+                        <i class="bi bi-calendar-x fs-3"></i>
                     </div>
-                    <h6 class="fw-semibold">Leave</h6>
+                    <h6 class="fw-semibold mb-0">Leave</h6>
                 </div>
             </a>
         </div>
     </div>
 
-    {{-- Info Cards --}}
+    {{-- ================= INFO CARDS ================= --}}
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-6">
-            <div class="card bg-sp-primary text-white shadow-soft h-100">
-                <div class="card-body">
+            <div class="card bg-sp-primary text-white shadow-soft info-card h-100">
+                <div class="card-body text-center">
                     <h6>Total Employees</h6>
                     <h2 class="fw-bold mb-0">{{ $totalKaryawan ?? 0 }}</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-6">
-            <div class="card bg-sp-success text-white shadow-soft h-100">
-                <div class="card-body">
+            <div class="card bg-sp-success text-white shadow-soft info-card h-100">
+                <div class="card-body text-center">
                     <h6>Today’s Attendance</h6>
                     <h2 class="fw-bold mb-0">{{ $absensiHariIni ?? 0 }}</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-6">
-            <div class="card bg-sp-warning text-white shadow-soft h-100">
-                <div class="card-body">
+            <div class="card bg-sp-warning text-white shadow-soft info-card h-100">
+                <div class="card-body text-center">
                     <h6>Overtime This Month</h6>
                     <h2 class="fw-bold mb-0">{{ $totalLembur ?? 0 }}</h2>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-6">
-            <div class="card bg-sp-danger text-white shadow-soft h-100">
-                <div class="card-body">
+            <div class="card bg-sp-danger text-white shadow-soft info-card h-100">
+                <div class="card-body text-center">
                     <h6>Leave Requests</h6>
                     <h2 class="fw-bold mb-0">{{ $totalCuti ?? 0 }}</h2>
                 </div>
@@ -185,11 +202,13 @@
         </div>
     </div>
 
-    {{-- Charts --}}
+    {{-- ================= CHARTS ================= --}}
     <div class="row g-3 mb-4">
         <div class="col-md-6">
             <div class="card shadow-soft border-0 h-100">
-                <div class="card-header bg-white fw-semibold">Attendance Statistics</div>
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-graph-up text-sp-primary me-2"></i> Attendance Statistics
+                </div>
                 <div class="card-body">
                     <canvas id="absensiChart" height="150"></canvas>
                 </div>
@@ -197,7 +216,9 @@
         </div>
         <div class="col-md-6">
             <div class="card shadow-soft border-0 h-100">
-                <div class="card-header bg-white fw-semibold">Overtime Statistics</div>
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-bar-chart-line text-sp-warning me-2"></i> Overtime Statistics
+                </div>
                 <div class="card-body">
                     <canvas id="lemburChart" height="150"></canvas>
                 </div>
@@ -205,9 +226,11 @@
         </div>
     </div>
 
-    {{-- Latest Employees --}}
-    <div class="card shadow-soft border-0">
-        <div class="card-header bg-white fw-semibold">Latest Employees</div>
+    {{-- ================= LATEST EMPLOYEES ================= --}}
+    <div class="card shadow-soft border-0 mb-5">
+        <div class="card-header bg-white fw-semibold">
+            <i class="bi bi-person-lines-fill text-sp-primary me-2"></i> Latest Employees
+        </div>
         <div class="card-body">
             @forelse($karyawanTerbaru ?? [] as $karyawan)
                 <div class="d-flex align-items-center border-bottom py-2">
@@ -230,7 +253,7 @@
     </div>
 </div>
 
-{{-- ChartJS --}}
+{{-- ================= CHART JS ================= --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Attendance Chart
