@@ -3,21 +3,79 @@
 @section('title', 'Edit Karyawan')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
-    {{-- Custom Styles --}}
+    {{-- ==================== CUSTOM STYLES ==================== --}}
     <style>
-        body { background-color: #f8fafc; font-family: 'Poppins', sans-serif; }
-        .card { border-radius: 15px; }
-        .card-header { border-top-left-radius: 15px !important; border-top-right-radius: 15px !important; }
-        .shadow-soft { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-        .fw-semibold { font-weight: 600 !important; }
-        .btn-rounded { border-radius: 50px; }
-        .form-control:focus { box-shadow: none; border-color: #118ab2; }
-        small.text-muted { display: block; margin-top: -4px; margin-bottom: 6px; }
+        body {
+            background-color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .card {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .card-header {
+            border-top-left-radius: 15px !important;
+            border-top-right-radius: 15px !important;
+        }
+
+        .shadow-soft {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .fw-semibold {
+            font-weight: 600 !important;
+        }
+
+        .btn-rounded {
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded:hover {
+            transform: translateY(-2px);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: none;
+            border-color: #118ab2;
+        }
+
+        small.text-muted {
+            display: block;
+            margin-top: -4px;
+            margin-bottom: 6px;
+        }
+
+        label.form-label {
+            color: #2b2d42;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            color: #118ab2;
+            margin-top: 1.2rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.4rem;
+        }
+
+        .bg-sp-primary {
+            background-color: #118ab2 !important;
+        }
+
+        .alert ul {
+            margin-top: 0.5rem;
+            margin-bottom: 0;
+            padding-left: 1.3rem;
+        }
     </style>
 
-    {{-- Header --}}
+    {{-- ==================== HEADER ==================== --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="fw-bold text-primary mb-0">
@@ -30,38 +88,39 @@
         </a>
     </div>
 
-    {{-- Alerts --}}
-    @if($errors->any())
+    {{-- ==================== ALERTS ==================== --}}
+    @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show shadow-soft" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>Mohon periksa kembali inputan Anda.
-            <ul class="mb-0 mt-1">
-                @foreach($errors->all() as $error)
+            <ul>
+                @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
-    @if(session('success'))
+    @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-soft" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    {{-- Form Card --}}
-    <div class="card border-0 shadow-soft">
+    {{-- ==================== FORM CARD ==================== --}}
+    <div class="card shadow-soft">
         <div class="card-header bg-sp-primary text-white fw-semibold">
             <i class="bi bi-person-fill me-2"></i>Form Edit Karyawan
         </div>
-        <div class="card-body">
+
+        <div class="card-body px-4 py-4">
             <form action="{{ route('karyawan.update', $karyawan->kar_kode) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="row g-3">
-
-                    {{-- NIP & NIK --}}
+                {{-- ========= IDENTITAS DASAR ========= --}}
+                <h6 class="form-section-title">Identitas Karyawan</h6>
+                <div class="row g-3 mt-1">
                     <div class="col-md-6">
                         <label for="kar_nip" class="form-label fw-semibold">NIP</label>
                         <input type="text" class="form-control" id="kar_nip" name="kar_nip"
@@ -73,7 +132,6 @@
                                value="{{ old('kar_nik', $karyawan->kar_nik) }}">
                     </div>
 
-                    {{-- Nama & Gelar --}}
                     <div class="col-md-6">
                         <label for="kar_nama" class="form-label fw-semibold">Nama Lengkap</label>
                         <input type="text" class="form-control" id="kar_nama" name="kar_nama"
@@ -89,8 +147,11 @@
                         <input type="text" class="form-control" id="kar_gelar_belakang" name="kar_gelar_belakang"
                                value="{{ old('kar_gelar_belakang', $karyawan->kar_gelar_belakang) }}">
                     </div>
+                </div>
 
-                    {{-- Tempat & Tanggal Lahir --}}
+                {{-- ========= LAHIR & ALAMAT ========= --}}
+                <h6 class="form-section-title">Data Pribadi</h6>
+                <div class="row g-3 mt-1">
                     <div class="col-md-6">
                         <label for="kar_lahir_tmp" class="form-label fw-semibold">Tempat Lahir</label>
                         <input type="text" class="form-control" id="kar_lahir_tmp" name="kar_lahir_tmp"
@@ -101,8 +162,6 @@
                         <input type="date" class="form-control" id="kar_lahir_tgl" name="kar_lahir_tgl"
                                value="{{ old('kar_lahir_tgl', $karyawan->kar_lahir_tgl) }}">
                     </div>
-
-                    {{-- Jenis Kelamin & Alamat --}}
                     <div class="col-md-6">
                         <label for="kar_jekel" class="form-label fw-semibold">Jenis Kelamin</label>
                         <select class="form-select" id="kar_jekel" name="kar_jekel">
@@ -116,10 +175,13 @@
                         <input type="text" class="form-control" id="kar_alamat" name="kar_alamat"
                                value="{{ old('kar_alamat', $karyawan->kar_alamat) }}">
                     </div>
+                </div>
 
-                    {{-- Email & HP --}}
+                {{-- ========= KONTAK ========= --}}
+                <h6 class="form-section-title">Kontak & Komunikasi</h6>
+                <div class="row g-3 mt-1">
                     <div class="col-md-6">
-                        <label for="kar_email" class="form-label fw-semibold">Email</label>
+                        <label for="kar_email" class="form-label fw-semibold">Email Pribadi</label>
                         <input type="email" class="form-control" id="kar_email" name="kar_email"
                                value="{{ old('kar_email', $karyawan->kar_email) }}">
                     </div>
@@ -128,23 +190,26 @@
                         <input type="email" class="form-control" id="kar_email_perusahaan" name="kar_email_perusahaan"
                                value="{{ old('kar_email_perusahaan', $karyawan->kar_email_perusahaan) }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="kar_hp" class="form-label fw-semibold">No HP</label>
                         <input type="text" class="form-control" id="kar_hp" name="kar_hp"
                                value="{{ old('kar_hp', $karyawan->kar_hp) }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="kar_wa" class="form-label fw-semibold">No WA</label>
                         <input type="text" class="form-control" id="kar_wa" name="kar_wa"
                                value="{{ old('kar_wa', $karyawan->kar_wa) }}">
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="kar_telegram" class="form-label fw-semibold">Telegram</label>
                         <input type="text" class="form-control" id="kar_telegram" name="kar_telegram"
                                value="{{ old('kar_telegram', $karyawan->kar_telegram) }}">
                     </div>
+                </div>
 
-                    {{-- Rekening, BPJS, Jamsostek, NPWP --}}
+                {{-- ========= DOKUMEN ========= --}}
+                <h6 class="form-section-title">Data Administratif</h6>
+                <div class="row g-3 mt-1">
                     <div class="col-md-6">
                         <label for="kar_norek" class="form-label fw-semibold">No Rekening</label>
                         <input type="text" class="form-control" id="kar_norek" name="kar_norek"
@@ -165,19 +230,22 @@
                         <input type="text" class="form-control" id="kar_npwp" name="kar_npwp"
                                value="{{ old('kar_npwp', $karyawan->kar_npwp) }}">
                     </div>
+                </div>
 
-                    {{-- Master Data --}}
-                    @php
-                        function selectOption($data, $oldKey, $valueKey, $nameKey, $karyawanValue) {
-                            foreach($data ?? [] as $item) {
-                                $value = is_array($item) ? $item[$valueKey] : $item->$valueKey;
-                                $name = is_array($item) ? $item[$nameKey] : $item->$nameKey;
-                                $selected = old($oldKey, $karyawanValue) == $value ? 'selected' : '';
-                                echo "<option value='{$value}' {$selected}>{$name}</option>";
-                            }
+                {{-- ========= MASTER DATA ========= --}}
+                @php
+                    function selectOption($data, $oldKey, $valueKey, $nameKey, $karyawanValue) {
+                        foreach($data ?? [] as $item) {
+                            $value = is_array($item) ? $item[$valueKey] : $item->$valueKey;
+                            $name = is_array($item) ? $item[$nameKey] : $item->$nameKey;
+                            $selected = old($oldKey, $karyawanValue) == $value ? 'selected' : '';
+                            echo "<option value='{$value}' {$selected}>{$name}</option>";
                         }
-                    @endphp
+                    }
+                @endphp
 
+                <h6 class="form-section-title">Master Data Karyawan</h6>
+                <div class="row g-3 mt-1">
                     <div class="col-md-4">
                         <label for="agama_kode" class="form-label fw-semibold">Agama</label>
                         <select class="form-select" id="agama_kode" name="agama_kode">
@@ -185,7 +253,6 @@
                             {!! selectOption($agamas, 'agama_kode', 'agama_kode', 'agama_nama', $karyawan->agama_kode) !!}
                         </select>
                     </div>
-
                     <div class="col-md-4">
                         <label for="profesi_kode" class="form-label fw-semibold">Profesi</label>
                         <select class="form-select" id="profesi_kode" name="profesi_kode">
@@ -193,7 +260,6 @@
                             {!! selectOption($profesis, 'profesi_kode', 'profesi_kode', 'profesi_nama', $karyawan->profesi_kode) !!}
                         </select>
                     </div>
-
                     <div class="col-md-4">
                         <label for="unit_kode" class="form-label fw-semibold">Unit</label>
                         <select class="form-select" id="unit_kode" name="unit_kode">
@@ -201,7 +267,6 @@
                             {!! selectOption($units, 'unit_kode', 'unit_kode', 'unit_nama', $karyawan->unit_kode) !!}
                         </select>
                     </div>
-
                     <div class="col-md-4">
                         <label for="jabatan_kode" class="form-label fw-semibold">Jabatan</label>
                         <select class="form-select" id="jabatan_kode" name="jabatan_kode">
@@ -209,7 +274,6 @@
                             {!! selectOption($jabatans, 'jabatan_kode', 'jabatan_kode', 'jabatan_nama', $karyawan->jabatan_kode) !!}
                         </select>
                     </div>
-
                     <div class="col-md-4">
                         <label for="golongan_kode" class="form-label fw-semibold">Golongan</label>
                         <select class="form-select" id="golongan_kode" name="golongan_kode">
@@ -217,7 +281,6 @@
                             {!! selectOption($golongans, 'golongan_kode', 'golongan_kode', 'golongan_nama', $karyawan->golongan_kode) !!}
                         </select>
                     </div>
-
                     <div class="col-md-4">
                         <label for="status_kode" class="form-label fw-semibold">Status</label>
                         <select class="form-select" id="status_kode" name="status_kode">
@@ -225,7 +288,6 @@
                             {!! selectOption($statuses, 'status_kode', 'status_kode', 'status_nama', $karyawan->status_kode) !!}
                         </select>
                     </div>
-
                     <div class="col-md-4">
                         <label for="tipe_kode" class="form-label fw-semibold">Tipe</label>
                         <select class="form-select" id="tipe_kode" name="tipe_kode">
@@ -233,14 +295,14 @@
                             {!! selectOption($tipes, 'tipe_kode', 'tipe_kode', 'tipe_nama', $karyawan->tipe_kode) !!}
                         </select>
                     </div>
-
                 </div>
 
+                {{-- ========= ACTION BUTTONS ========= --}}
                 <div class="mt-4 text-end">
-                    <button type="submit" class="btn btn-primary btn-rounded shadow-sm">
+                    <button type="submit" class="btn btn-primary btn-rounded shadow-sm px-4">
                         <i class="bi bi-save me-1"></i> Simpan Perubahan
                     </button>
-                    <a href="{{ route('karyawan.index') }}" class="btn btn-secondary btn-rounded shadow-sm">
+                    <a href="{{ route('karyawan.index') }}" class="btn btn-secondary btn-rounded shadow-sm px-4">
                         <i class="bi bi-x-circle me-1"></i> Batal
                     </a>
                 </div>
@@ -248,6 +310,5 @@
             </form>
         </div>
     </div>
-
 </div>
 @endsection
