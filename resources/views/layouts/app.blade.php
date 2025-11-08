@@ -258,13 +258,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('jadwal.index') }}"
-                            class="nav-link {{ request()->routeIs('jadwal.*') ? 'active' : '' }}">
-                            <i class="bi bi-calendar-week-fill"></i>
-                            <span>Jadwal Kerja</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a href="{{ route('absensi.index') }}"
                             class="nav-link {{ request()->routeIs('absensi.*') ? 'active' : '' }}">
                             <i class="bi bi-check-circle-fill"></i>
@@ -272,7 +265,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('lembur.index') }}" class="nav-link">
                             <i class="bi bi-clock-fill"></i>
                             <span>Overtime</span>
                         </a>

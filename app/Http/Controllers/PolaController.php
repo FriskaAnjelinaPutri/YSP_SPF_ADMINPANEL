@@ -145,7 +145,7 @@ class PolaController extends Controller
         if (!$this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
-
+        
         $pola = Http::withToken($this->token())
             ->acceptJson()
             ->get($this->apiBase . '/pola/' . $kode);
@@ -181,13 +181,11 @@ class PolaController extends Controller
             'tipe_kode' => $request->tipe_kode,
             'jadwal_kode' => $request->jadwal_kode,
             'urut' => $request->urut,
-            '_method' => 'PUT',
         ];
 
         $response = Http::withToken($this->token())
             ->acceptJson()
-            ->asForm()
-            ->post($this->apiBase . '/pola/' . $kode, $payload);
+            ->put($this->apiBase . '/pola/' . $kode, $payload);
 
         Log::info('API Pola Update Response:', [
             'status' => $response->status(),

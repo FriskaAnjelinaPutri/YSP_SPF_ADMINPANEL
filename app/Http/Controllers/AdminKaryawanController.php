@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AdminKaryawanController extends Controller
 {
@@ -13,10 +14,35 @@ class AdminKaryawanController extends Controller
         return session('api_token');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $res = Http::withToken($this->token())->get($this->apiBase.'/karyawan')->json();
-        $karyawans = $res['data'] ?? [];
+        $search = $request->input('search');
+        $url = $this->apiBase.'/karyawan';
+
+        $queryParams = [];
+        if ($search) {
+            // Menggunakan 'nama' sebagai parameter pencarian, asumsi API mendukung ini
+            $queryParams['nama'] = $search;
+        }
+
+        Log::info('Mengambil data karyawan dari API', ['url' => $url, 'params' => $queryParams]);
+
+        $response = Http::withToken($this->token())->get($url, $queryParams);
+
+        if ($response->failed()) {
+            Log::error('Gagal ambil data karyawan', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            return view('karyawan.index', [
+                'karyawans' => [],
+                'error' => 'Gagal mengambil data karyawan dari API.',
+            ]);
+        }
+
+        $karyawansData = $response->json()['data'] ?? [];
+        $karyawans = json_decode(json_encode($karyawansData));
+
         return view('karyawan.index', compact('karyawans'));
     }
 

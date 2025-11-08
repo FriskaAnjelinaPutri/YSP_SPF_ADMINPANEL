@@ -24,16 +24,34 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Absensi Management
-    Route::resource('absensi', AbsensiController::class);
+    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
+    Route::get('/absensi/create', [AbsensiController::class, 'create'])->name('absensi.create');
+    Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
+    Route::get('/absensi/{absensi}', [AbsensiController::class, 'show'])->name('absensi.show');
+    Route::get('/absensi/{absensi}/edit', [AbsensiController::class, 'edit'])->name('absensi.edit');
+    Route::put('/absensi/{absensi}', [AbsensiController::class, 'update'])->name('absensi.update');
+    Route::delete('/absensi/{absensi}', [AbsensiController::class, 'destroy'])->name('absensi.destroy');
     Route::get('/absensi/export', [AbsensiController::class, 'export'])->name('absensi.export');
 
     // Cuti Management
-    Route::resource('cuti', CutiController::class);
+    Route::get('/cuti', [CutiController::class, 'index'])->name('cuti.index');
+    Route::get('/cuti/create', [CutiController::class, 'create'])->name('cuti.create');
+    Route::post('/cuti', [CutiController::class, 'store'])->name('cuti.store');
+    Route::get('/cuti/{cuti}', [CutiController::class, 'show'])->name('cuti.show');
+    Route::get('/cuti/{cuti}/edit', [CutiController::class, 'edit'])->name('cuti.edit');
+    Route::put('/cuti/{cuti}', [CutiController::class, 'update'])->name('cuti.update');
+    Route::delete('/cuti/{cuti}', [CutiController::class, 'destroy'])->name('cuti.destroy');
     Route::post('/cuti/{id}/approve', [CutiController::class, 'approve'])->name('cuti.approve');
     Route::post('/cuti/{id}/reject', [CutiController::class, 'reject'])->name('cuti.reject');
 
     // Lembur Management
-    Route::resource('lembur', LemburController::class);
+    Route::get('/lembur', [LemburController::class, 'index'])->name('lembur.index');
+    Route::get('/lembur/create', [LemburController::class, 'create'])->name('lembur.create');
+    Route::post('/lembur', [LemburController::class, 'store'])->name('lembur.store');
+    Route::get('/lembur/{lembur}', [LemburController::class, 'show'])->name('lembur.show');
+    Route::get('/lembur/{lembur}/edit', [LemburController::class, 'edit'])->name('lembur.edit');
+    Route::put('/lembur/{lembur}', [LemburController::class, 'update'])->name('lembur.update');
+    Route::delete('/lembur/{lembur}', [LemburController::class, 'destroy'])->name('lembur.destroy');
     Route::post('/lembur/{id}/approve', [LemburController::class, 'approve'])->name('lembur.approve');
     Route::post('/lembur/{id}/reject', [LemburController::class, 'reject'])->name('lembur.reject');
 

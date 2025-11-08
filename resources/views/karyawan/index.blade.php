@@ -161,7 +161,7 @@ td.text-center .btn { margin-bottom: 2px; }
             <h5 class="mb-0 fw-semibold">
                 <i class="bi bi-list-ul me-2"></i>Daftar Karyawan
             </h5>
-            <form method="GET" action="{{ route('karyawan.index') }}" class="d-flex" style="width: 280px;" id="searchForm">
+            <form method="GET" action="{{ url('/karyawan') }}" class="d-flex" style="width: 280px;" id="searchForm">
                 <input name="search" id="searchInput" type="text" class="form-control border-end-0" placeholder="Cari karyawan..." value="{{ request('search') }}">
                 <button type="submit" class="btn btn-outline-light border-start-0"><i class="bi bi-search"></i></button>
             </form>
