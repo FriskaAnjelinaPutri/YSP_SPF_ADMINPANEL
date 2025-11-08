@@ -14,243 +14,183 @@
 
     <style>
         /* ===========================
-           GLOBAL & BACKGROUND STYLING
+           GLOBAL STYLE (match dashboard)
         ============================ */
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            background-color: #f0fdf4; /* same as dashboard */
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Floating blurred background circles */
-        .circle {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            opacity: 0.5;
-            animation: float 10s ease-in-out infinite alternate;
-        }
-
-        .circle.one {
-            width: 350px;
-            height: 350px;
-            background: #90e0ef;
-            top: -80px;
-            left: -100px;
-        }
-
-        .circle.two {
-            width: 400px;
-            height: 400px;
-            background: #caf0f8;
-            bottom: -120px;
-            right: -120px;
-        }
-
-        @keyframes float {
-            from { transform: translateY(0); }
-            to { transform: translateY(30px); }
         }
 
         /* ===========================
-           LOGIN CARD STYLING
+           LOGIN CARD STYLE
         ============================ */
         .login-card {
-            position: relative;
-            z-index: 5;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
+            background: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
             width: 100%;
             max-width: 420px;
+            padding: 2rem;
             transition: all 0.3s ease;
         }
 
         .login-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         /* ===========================
            HEADER
         ============================ */
-        .card-header {
-            background: linear-gradient(135deg, #0077b6, #00b4d8);
+        .login-header {
             text-align: center;
-            padding: 40px 20px;
+            margin-bottom: 1.5rem;
         }
 
-        .card-header img {
+        .login-header img {
             width: 70px;
-            margin-bottom: 10px;
-            animation: bounce 3s infinite ease-in-out;
+            margin-bottom: 0.5rem;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .card-header h4 {
-            color: #fff;
+        .login-header h4 {
             font-weight: 700;
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
+            color: #166534; /* dark green like dashboard title */
         }
 
-        .card-header p {
-            color: rgba(255, 255, 255, 0.8);
+        .login-header p {
+            color: #16a34a; /* main green */
             font-size: 14px;
+            margin-bottom: 0;
         }
 
         /* ===========================
-           FORM STYLING
+           FORM ELEMENTS
         ============================ */
-        .card-body {
-            padding: 35px 30px;
-        }
-
         .form-label {
             font-weight: 500;
-            color: #333;
+            color: #1f2937;
         }
 
         .form-control {
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 10px 12px;
-            border: 1px solid #d0d0d0;
+            border: 1px solid #d1d5db;
             transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: #00b4d8;
-            box-shadow: 0 0 8px rgba(0, 180, 216, 0.4);
+            border-color: #22c55e;
+            box-shadow: 0 0 6px rgba(34, 197, 94, 0.25);
         }
 
         .input-group-text {
-            background-color: #fff;
-            border: 1px solid #d0d0d0;
+            background: #f9fafb;
+            border: 1px solid #d1d5db;
             border-left: none;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 10px 10px 0;
+            color: #16a34a;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .input-group-text:hover {
-            background-color: #f1faff;
-            color: #00b4d8;
         }
 
         /* ===========================
-           BUTTON STYLING
+           BUTTON STYLE
         ============================ */
         .btn-login {
-            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            background-color: #16a34a; /* main green */
             border: none;
             color: #fff;
             font-weight: 600;
             padding: 12px;
-            border-radius: 12px;
+            border-radius: 10px;
             width: 100%;
-            box-shadow: 0 5px 15px rgba(0, 119, 182, 0.3);
             transition: all 0.3s ease;
         }
 
         .btn-login:hover {
-            background: linear-gradient(135deg, #0096c7, #0077b6);
-            transform: scale(1.03);
-            box-shadow: 0 8px 20px rgba(0, 119, 182, 0.4);
+            background-color: #15803d;
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(22, 101, 52, 0.3);
         }
 
         /* ===========================
-           FOOTER TEXT
+           ALERTS & FOOTER
         ============================ */
+        .alert {
+            font-size: 14px;
+            border-radius: 10px;
+        }
+
         .footer-text {
             text-align: center;
             font-size: 13px;
             color: #555;
-            margin-top: 20px;
-        }
-
-        .alert {
-            font-size: 14px;
-            border-radius: 12px;
+            margin-top: 1.5rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- Background floating shapes -->
-    <div class="circle one"></div>
-    <div class="circle two"></div>
-
-    <!-- Login card -->
     <div class="login-card">
-        <div class="card-header">
+        <div class="login-header">
             <img src="https://cdn-icons-png.flaticon.com/512/2966/2966487.png" alt="Hospital Icon">
             <h4>Admin Panel Login</h4>
-            <p class="text-white-50 mb-0">Employee Attendance System</p>
+            <p>Employee Attendance System</p>
         </div>
 
-        <div class="card-body p-4">
-            {{-- Session error --}}
-            @if(session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
+        {{-- Session error --}}
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
-            {{-- Validation errors --}}
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <form action="{{ route('login.process') }}" method="POST">
-                @csrf
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input
-                        type="email"
-                        name="email"
-                        class="form-control"
-                        value="{{ old('email') }}"
-                        required
-                        placeholder="Enter your email">
-                </div>
-
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <div class="input-group">
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-control"
-                            required
-                            placeholder="Enter your password">
-                        <span class="input-group-text" onclick="togglePassword()" title="Show/Hide Password">
-                            <i class="bi bi-eye" id="toggleIcon"></i>
-                        </span>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-login">Sign In</button>
-            </form>
-
-            <div class="footer-text mt-3">
-                &copy; {{ date('Y') }} Semen Padang Hospital
+        {{-- Validation errors --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
+        @endif
+
+        <form action="{{ route('login.process') }}" method="POST">
+            @csrf
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input
+                    type="email"
+                    name="email"
+                    class="form-control"
+                    value="{{ old('email') }}"
+                    required
+                    placeholder="Enter your email">
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
+                        required
+                        placeholder="Enter your password">
+                    <span class="input-group-text" onclick="togglePassword()" title="Show/Hide Password">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-login">Sign In</button>
+        </form>
+
+        <div class="footer-text">
+            &copy; {{ date('Y') }} Semen Padang Hospital
         </div>
     </div>
 
