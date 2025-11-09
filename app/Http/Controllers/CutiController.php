@@ -32,16 +32,16 @@ class CutiController extends Controller
         try {
             $periode = $request->get('periode', Carbon::now()->format('Y-m'));
             $status = $request->get('status');
-            $karyawanId = $request->get('karyawan_id');
+            $kar_kode = $request->get('kar_kode');
 
-            $url = $this->apiBase() . '/admin/cuti';
+            $url = $this->apiBase() . '/cuti';
             $params = ['periode' => $periode];
 
             if ($status) {
                 $params['status'] = $status;
             }
-            if ($karyawanId) {
-                $params['karyawan_id'] = $karyawanId;
+            if ($kar_kode) {
+                $params['kar_kode'] = $kar_kode;
             }
 
             $response = Http::withToken($this->token())
@@ -80,101 +80,6 @@ class CutiController extends Controller
             ]);
         }
     }
-
-    /**
-     * Show the form for creating a new cuti
-     */
-    public function create()
-    {
-        if (!$this->token()) {
-            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
-        }
-
-        try {
-            // Get list karyawan
-            $response = Http::withToken($this->token())
-                ->acceptJson()
-                ->get($this->apiBase() . '/karyawan');
-
-            $karyawans = $response->successful() ?
-                ($response->json()['data'] ?? []) : [];
-
-            return view('cuti.create', compact('karyawans'));
-
-        } catch (\Exception $e) {
-            Log::error('Error saat load form create cuti', ['error' => $e->getMessage()]);
-            return redirect()->route('cuti.index')
-                ->with('error', 'Terjadi kesalahan saat memuat form');
-        }
-    }
-
-    /**
-     * Store a newly created cuti
-     */
-    public function store(Request $request)
-    {
-        if (!$this->token()) {
-            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
-        }
-
-        $request->validate([
-            'karyawan_id' => 'required|integer',
-            'tanggal_mulai' => 'required|date',
-            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'jenis_cuti' => 'required|in:Tahunan,Sakit,Melahirkan,Menikah,Keluarga Meninggal,Lainnya',
-            'alasan' => 'required|string|max:500',
-            'status' => 'required|in:Pending,Approved,Rejected',
-            'keterangan' => 'nullable|string|max:500'
-        ]);
-
-        try {
-            $response = Http::withToken($this->token())
-                ->acceptJson()
-                ->post($this->apiBase() . '/admin/cuti', $request->all());
-
-            if ($response->successful()) {
-                return redirect()->route('cuti.index')
-                    ->with('success', 'Data cuti berhasil ditambahkan');
-            }
-
-            $error = $response->json()['message'] ?? 'Gagal menyimpan data cuti';
-            return back()->withInput()->with('error', $error);
-
-        } catch (\Exception $e) {
-            Log::error('Error saat menyimpan cuti', ['error' => $e->getMessage()]);
-            return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data');
-        }
-    }
-
-    /**
-     * Display the specified cuti
-     */
-    public function show($id)
-    {
-        if (!$this->token()) {
-            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
-        }
-
-        try {
-            $response = Http::withToken($this->token())
-                ->acceptJson()
-                ->get($this->apiBase() . '/admin/cuti/' . $id);
-
-            if ($response->successful()) {
-                $cuti = $response->json()['data'] ?? null;
-                return view('cuti.show', compact('cuti'));
-            }
-
-            return redirect()->route('cuti.index')
-                ->with('error', 'Data cuti tidak ditemukan');
-
-        } catch (\Exception $e) {
-            Log::error('Error saat mengambil detail cuti', ['error' => $e->getMessage()]);
-            return redirect()->route('cuti.index')
-                ->with('error', 'Terjadi kesalahan saat mengambil data');
-        }
-    }
-
     /**
      * Show the form for editing the specified cuti
      */
@@ -187,7 +92,7 @@ class CutiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/cuti/' . $id);
+                ->get($this->apiBase() . '/cuti/' . $id);
 
             if ($response->failed()) {
                 return redirect()->route('cuti.index')
@@ -227,19 +132,17 @@ class CutiController extends Controller
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'jenis_cuti' => 'required|in:Tahunan,Sakit,Melahirkan,Menikah,Keluarga Meninggal,Lainnya',
             'alasan' => 'required|string|max:500',
-            'status' => 'required|in:Pending,Approved,Rejected',
             'keterangan' => 'nullable|string|max:500'
         ]);
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->put($this->apiBase() . '/admin/cuti/' . $id, [
+                ->put($this->apiBase() . '/cuti/' . $id, [
                     'tanggal_mulai' => $request->tanggal_mulai,
                     'tanggal_selesai' => $request->tanggal_selesai,
                     'jenis_cuti' => $request->jenis_cuti,
                     'alasan' => $request->alasan,
-                    'status' => $request->status,
                     'keterangan' => $request->keterangan,
                 ]);
 
@@ -269,7 +172,7 @@ class CutiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->delete($this->apiBase() . '/admin/cuti/' . $id);
+                ->delete($this->apiBase() . '/cuti/' . $id);
 
             if ($response->successful()) {
                 return redirect()->route('cuti.index')
@@ -297,7 +200,7 @@ class CutiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->post($this->apiBase() . '/admin/cuti/approve', [
+                ->post($this->apiBase() . '/cuti/approve', [
                     'id' => $id,
                     'status' => 'Approved'
                 ]);
@@ -328,7 +231,7 @@ class CutiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->post($this->apiBase() . '/admin/cuti/approve', [
+                ->post($this->apiBase() . '/cuti/approve', [
                     'id' => $id,
                     'status' => 'Rejected',
                     'keterangan' => $request->keterangan

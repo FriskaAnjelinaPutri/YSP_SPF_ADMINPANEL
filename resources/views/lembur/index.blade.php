@@ -41,9 +41,6 @@
             </h3>
             <small class="text-muted">Manajemen data pengajuan lembur</small>
         </div>
-        <a href="{{ route('lembur.create') }}" class="btn btn-primary shadow-sm btn-rounded">
-            <i class="bi bi-plus-circle me-1"></i> Tambah Pengajuan
-        </a>
     </div>
 
     {{-- Alerts --}}
@@ -60,6 +57,14 @@
         </div>
     @endif
 
+    {{-- Quick Filter Buttons --}}
+    <div class="mb-4">
+        <a href="{{ route('lembur.index', ['periode' => $periode, 'kar_kode' => request('kar_kode')]) }}" class="btn {{ !request('status') ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Semua</a>
+        <a href="{{ route('lembur.index', ['status' => 'Pending', 'periode' => $periode, 'kar_kode' => request('kar_kode')]) }}" class="btn {{ request('status') == 'Pending' ? 'btn-warning text-white' : 'btn-outline-warning' }} btn-rounded">Pending</a>
+        <a href="{{ route('lembur.index', ['status' => 'Approved', 'periode' => $periode, 'kar_kode' => request('kar_kode')]) }}" class="btn {{ request('status') == 'Approved' ? 'btn-success' : 'btn-outline-success' }} btn-rounded">Approved</a>
+        <a href="{{ route('lembur.index', ['status' => 'Rejected', 'periode' => $periode, 'kar_kode' => request('kar_kode')]) }}" class="btn {{ request('status') == 'Rejected' ? 'btn-danger' : 'btn-outline-danger' }} btn-rounded">Rejected</a>
+    </div>
+
     {{-- Filter Card --}}
     <div class="card mb-4">
         <div class="card-header text-white fw-semibold">
@@ -72,7 +77,7 @@
                         <label for="periode" class="form-label">Periode</label>
                         <input type="month" class="form-control" name="periode" id="periode" value="{{ $periode }}">
                     </div>
-                    <div class="col-md-3">
+                    {{-- <div class="col-md-3">
                         <label for="status" class="form-label">Status</label>
                         <select name="status" id="status" class="form-select">
                             <option value="">Semua Status</option>
@@ -80,7 +85,7 @@
                             <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Approved</option>
                             <option value="Rejected" {{ request('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
                         </select>
-                    </div>
+                    </div> --}}
                     <div class="col-md-3">
                         <label for="kar_kode" class="form-label">Karyawan</label>
                         <select name="kar_kode" id="kar_kode" class="form-select">
@@ -140,7 +145,6 @@
                                     <span class="badge badge-status badge-{{ $statusClass }}">{{ $lembur['status'] }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('lembur.show', $lembur['id']) }}" class="btn btn-sm btn-outline-info" title="Detail"><i class="bi bi-eye"></i></a>
                                     <a href="{{ route('lembur.edit', $lembur['id']) }}" class="btn btn-sm btn-outline-warning" title="Edit"><i class="bi bi-pencil-square"></i></a>
                                     <form action="{{ route('lembur.destroy', $lembur['id']) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                                         @csrf
@@ -159,6 +163,32 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Tolak Lembur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="" method="POST" id="rejectForm">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="keterangan" class="form-label">Keterangan</label>
+                        <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Tolak</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

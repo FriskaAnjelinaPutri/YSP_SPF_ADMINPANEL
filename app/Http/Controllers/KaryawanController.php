@@ -33,7 +33,11 @@ class KaryawanController extends Controller
         }
 
         $search = $request->get('search');
-        $params = $search ? ['search' => $search] : [];
+        $page = $request->get('page', 1); // ambil nomor halaman
+        $params = array_filter([
+            'search' => $search,
+            'page' => $page,
+        ]);
 
         $response = Http::withToken($this->token())->get($this->apiBase . '/karyawan', $params);
 
@@ -48,43 +52,33 @@ class KaryawanController extends Controller
             }
 
             return view('karyawan.index', [
-                'karyawans' => [],
+                'karyawans' => collect(),
+                'meta' => [],
+                'links' => [],
                 'error' => $errorMsg,
             ]);
         }
 
-        $data = $response->json()['data'] ?? [];
+        $json = $response->json();
+        $data = $json['data'] ?? [];
+        $meta = $json['meta'] ?? [];
+        $links = $json['links'] ?? [];
 
         $karyawans = collect($data)->map(function ($item) {
             $obj = (object) $item;
 
-            // Mapping untuk jabatan
-            $obj->jabatan = isset($item['jabatan']) ? (object) ['jabatan_nama' => $item['jabatan']['jabatan_nama'] ?? '-'] : (object) ['jabatan_nama' => $item['jabatan_nama'] ?? '-'];
-
-            // Mapping untuk unit
-            $obj->unit = isset($item['unit']) ? (object) ['unit_nama' => $item['unit']['unit_nama'] ?? '-'] : (object) ['unit_nama' => $item['unit_nama'] ?? '-'];
-
-            // Mapping untuk golongan
-            $obj->golongan = isset($item['golongan']) ? (object) ['golongan_nama' => $item['golongan']['golongan_nama'] ?? '-'] : (object) ['golongan_nama' => $item['golongan_nama'] ?? '-'];
-
-            // ✅ Tambahkan mapping untuk tipe
-            $obj->tipe = isset($item['tipe']) ? (object) ['tipe_nama' => $item['tipe']['tipe_nama'] ?? '-'] : (object) ['tipe_nama' => $item['tipe_nama'] ?? '-'];
-
-            // ✅ Tambahkan mapping untuk profesi
-            $obj->profesi = isset($item['profesi']) ? (object) ['profesi_nama' => $item['profesi']['profesi_nama'] ?? '-'] : (object) ['profesi_nama' => $item['profesi_nama'] ?? '-'];
-
-            // ✅ Tambahkan mapping untuk status
-            $obj->status = isset($item['status']) ? (object) ['status_nama' => $item['status']['status_nama'] ?? '-'] : (object) ['status_nama' => $item['status_nama'] ?? '-'];
-
-            // ✅ Tambahkan mapping untuk agama (jika diperlukan)
-            $obj->agama = isset($item['agama']) ? (object) ['agama_nama' => $item['agama']['agama_nama'] ?? '-'] : (object) ['agama_nama' => $item['agama_nama'] ?? '-'];
-
-            $obj->status = isset($item['status']) ? (object) ['status_nama' => $item['status']['status_nama'] ?? '-'] : (object) ['status_nama' => $item['status_nama'] ?? '-'];
+            $obj->jabatan = (object) ['jabatan_nama' => $item['jabatan']['jabatan_nama'] ?? ($item['jabatan_nama'] ?? '-')];
+            $obj->unit = (object) ['unit_nama' => $item['unit']['unit_nama'] ?? ($item['unit_nama'] ?? '-')];
+            $obj->golongan = (object) ['golongan_nama' => $item['golongan']['golongan_nama'] ?? ($item['golongan_nama'] ?? '-')];
+            $obj->tipe = (object) ['tipe_nama' => $item['tipe']['tipe_nama'] ?? ($item['tipe_nama'] ?? '-')];
+            $obj->profesi = (object) ['profesi_nama' => $item['profesi']['profesi_nama'] ?? ($item['profesi_nama'] ?? '-')];
+            $obj->status = (object) ['status_nama' => $item['status']['status_nama'] ?? ($item['status_nama'] ?? '-')];
+            $obj->agama = (object) ['agama_nama' => $item['agama']['agama_nama'] ?? ($item['agama_nama'] ?? '-')];
 
             return $obj;
         });
 
-        return view('karyawan.index', compact('karyawans'));
+        return view('karyawan.index', compact('karyawans', 'meta', 'links'));
     }
 
     /**

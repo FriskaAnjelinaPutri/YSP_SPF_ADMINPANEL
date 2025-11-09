@@ -66,7 +66,7 @@
             <i class="bi bi-pencil-square me-2"></i>Form Edit Lembur
         </div>
         <div class="card-body px-4 py-4">
-            <form action="{{ route('lembur.update', $lembur->id) }}" method="POST">
+            <form action="{{ route('lembur.update', $lembur['id']) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="row g-3">

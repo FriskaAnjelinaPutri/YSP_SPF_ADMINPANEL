@@ -202,6 +202,57 @@
             display: block;
         }
 
+        /* Collapsed Sidebar Styles */
+        .sidebar.collapsed {
+            width: 90px;
+        }
+
+        .sidebar.collapsed .sidebar-header h5,
+        .sidebar.collapsed .nav-link span,
+        .sidebar.collapsed .btn-logout span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+        }
+        
+        .sidebar.collapsed .sidebar-header img {
+            margin-right: 0;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+
+        .sidebar.collapsed .btn-logout {
+            justify-content: center;
+        }
+
+        .content.collapsed {
+            margin-left: 90px;
+            width: calc(100% - 90px);
+        }
+
+        /* Global Badge Styles for consistency */
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.8em;
+            border-radius: 12px;
+            font-weight: 500;
+            text-transform: capitalize;
+            color: #fff; /* Ensure text is white for all custom badges */
+        }
+        .badge-success { background-color: #28a745; } /* Green */
+        .badge-warning { background-color: #ffc107; } /* Yellow/Orange */
+        .badge-primary { background-color: #007bff; } /* Blue */
+        .badge-info { background-color: #17a2b8; } /* Cyan */
+        .badge-danger { background-color: #dc3545; } /* Red */
+
         @media (max-width: 992px) {
             .sidebar {
                 left: -280px;
@@ -271,7 +322,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="{{ route('cuti.index') }}" class="nav-link">
                             <i class="bi bi-calendar-x-fill"></i>
                             <span>Leave</span>
                         </a>
@@ -304,9 +355,14 @@
         <main class="content" id="content">
             <!-- Topbar -->
             <div class="topbar">
-                <button class="toggle-btn d-lg-none" id="toggleSidebar">
-                    <i class="bi bi-list"></i>
-                </button>
+                <div>
+                    <button class="toggle-btn d-lg-none" id="toggleSidebarMobile">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <button class="toggle-btn d-none d-lg-block" id="toggleSidebarDesktop">
+                        <i class="bi bi-list"></i>
+                    </button>
+                </div>
                 <div class="d-flex align-items-center user-info">
                     <i class="bi bi-person-circle me-2"></i>
                     <span>{{ session('user')['name'] ?? 'Admin' }}</span>
@@ -314,7 +370,7 @@
             </div>
 
             <!-- Page Content -->
-            <div class="mt-3">
+            <div class="mt-3 p-4">
                 @yield('content')
             </div>
         </main>
@@ -324,19 +380,50 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Sidebar Toggle for Mobile
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const toggleBtn = document.getElementById('toggleSidebar');
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const overlay = document.getElementById('overlay');
+            const toggleBtnMobile = document.getElementById('toggleSidebarMobile');
+            const toggleBtnDesktop = document.getElementById('toggleSidebarDesktop');
 
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        });
+            // Function to toggle sidebar for desktop
+            const toggleDesktopSidebar = () => {
+                sidebar.classList.toggle('collapsed');
+                content.classList.toggle('collapsed');
+                // Save state to localStorage
+                if (sidebar.classList.contains('collapsed')) {
+                    localStorage.setItem('sidebarState', 'collapsed');
+                } else {
+                    localStorage.setItem('sidebarState', 'expanded');
+                }
+            };
 
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
+            // Function to toggle sidebar for mobile
+            const toggleMobileSidebar = () => {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            };
+
+            // Check for saved sidebar state on page load
+            if (localStorage.getItem('sidebarState') === 'collapsed' && window.innerWidth > 992) {
+                sidebar.classList.add('collapsed');
+                content.classList.add('collapsed');
+            }
+
+            // Event Listeners
+            if (toggleBtnDesktop) {
+                toggleBtnDesktop.addEventListener('click', toggleDesktopSidebar);
+            }
+            if (toggleBtnMobile) {
+                toggleBtnMobile.addEventListener('click', toggleMobileSidebar);
+            }
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
         });
     </script>
 </body>

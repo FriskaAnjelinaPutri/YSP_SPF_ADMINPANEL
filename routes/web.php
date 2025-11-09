@@ -23,6 +23,9 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+    // routes/web.php
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     // Absensi Management
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
     Route::get('/absensi/create', [AbsensiController::class, 'create'])->name('absensi.create');
