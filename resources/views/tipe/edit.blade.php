@@ -3,133 +3,180 @@
 @section('title', 'Edit Tipe')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    {{-- Header --}}
-    <div class="mb-6">
-        <div class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-            <a href="{{ route('tipe.index') }}" class="hover:text-indigo-600">Tipe</a>
-            <span>/</span>
-            <span class="text-gray-700">Edit Tipe</span>
-        </div>
-        <h1 class="text-2xl font-bold text-gray-800">Edit Tipe: {{ $tipe['tipe_kode'] ?? '' }}</h1>
+<div class="container-fluid">
+
+<style>
+/* === General === */
+body {
+    background-color: #f0fdf4;
+    font-family: 'Poppins', sans-serif;
+}
+h3, h5 { font-weight: 600; }
+.text-primary { color: #166534 !important; }
+.text-secondary { color: #6b7280 !important; }
+
+/* === Card === */
+.card {
+    border-radius: 20px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+.card:hover { transform: translateY(-3px); }
+.card-header {
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    color: #fff;
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+}
+
+/* === Buttons === */
+.btn-rounded {
+    border-radius: 50px;
+    transition: transform 0.2s ease;
+}
+.btn-rounded:hover { transform: scale(1.05); }
+
+.btn-primary {
+    background-color: #22c55e;
+    border: none;
+}
+.btn-primary:hover { background-color: #16a34a; }
+
+.btn-secondary {
+    background-color: #6b7280;
+    border: none;
+}
+.btn-secondary:hover { background-color: #4b5563; }
+
+/* === Form === */
+.form-label {
+    font-weight: 500;
+    color: #166534;
+}
+.form-select, .form-control {
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+}
+.form-select:focus, .form-control:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 0.15rem rgba(34,197,94,0.25);
+}
+
+/* === Alert === */
+.alert {
+    border-radius: 15px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+}
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+</style>
+
+{{-- Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-primary mb-0">
+            <i class="bi bi-pencil-square me-2"></i>Edit Tipe
+        </h3>
+        <small class="text-secondary">Perbarui informasi tipe kerja</small>
     </div>
+    <a href="{{ route('tipe.index') }}" class="btn btn-secondary btn-rounded shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Kembali
+    </a>
+</div>
 
-    {{-- Alert Error --}}
-    @if (session('error'))
-        <div class="mb-4 rounded-md bg-red-100 p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                              clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3 text-sm text-red-700">
-                    {{ session('error') }}
-                </div>
-            </div>
-        </div>
-    @endif
+{{-- Alert Error --}}
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
-    {{-- Form --}}
-    <div class="bg-white shadow rounded-lg">
-        <form action="{{ route('tipe.update', $tipe['tipe_kode']) }}" method="POST" class="p-6">
+{{-- Form Card --}}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Form Edit Tipe</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('tipe.update', $tipe['tipe_kode']) }}" method="POST">
             @csrf
             @method('PUT')
 
-            {{-- Kode Tipe (Read Only) --}}
-            <div class="mb-6">
-                <label for="tipe_kode" class="block text-sm font-medium text-gray-700 mb-2">
-                    Kode Tipe
-                </label>
-                <input type="text"
-                       name="tipe_kode"
-                       id="tipe_kode"
-                       value="{{ $tipe['tipe_kode'] }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-                       readonly>
-                <p class="mt-1 text-xs text-gray-500">Kode tidak dapat diubah</p>
+            {{-- Kode Tipe --}}
+            <div class="mb-4">
+                <label for="tipe_kode" class="form-label">Kode Tipe</label>
+                <input type="text" id="tipe_kode" name="tipe_kode"
+                       class="form-control bg-light"
+                       value="{{ $tipe['tipe_kode'] }}" readonly>
+                <small class="text-secondary">Kode tidak dapat diubah</small>
             </div>
 
             {{-- Nama Tipe --}}
-            <div class="mb-6">
-                <label for="tipe_nama" class="block text-sm font-medium text-gray-700 mb-2">
-                    Nama Tipe <span class="text-red-500">*</span>
-                </label>
-                <input type="text"
-                       name="tipe_nama"
-                       id="tipe_nama"
+            <div class="mb-4">
+                <label for="tipe_nama" class="form-label">Nama Tipe <span class="text-danger">*</span></label>
+                <input type="text" id="tipe_nama" name="tipe_nama"
+                       class="form-control @error('tipe_nama') is-invalid @enderror"
                        value="{{ old('tipe_nama', $tipe['tipe_nama']) }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('tipe_nama') border-red-500 @enderror"
-                       placeholder="Contoh: Shift Pagi"
-                       maxlength="100"
-                       required>
+                       placeholder="Contoh: Shift Pagi" maxlength="100" required>
                 @error('tipe_nama')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-                <p class="mt-1 text-xs text-gray-500">Maksimal 100 karakter</p>
+                <small class="text-secondary">Maksimal 100 karakter</small>
             </div>
 
             {{-- Status Aktif --}}
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Status <span class="text-red-500">*</span>
-                </label>
-                <div class="flex items-center space-x-6">
-                    <label class="inline-flex items-center">
-                        <input type="radio"
-                               name="tipe_aktif"
-                               value="1"
-                               {{ old('tipe_aktif', $tipe['tipe_aktif']) == 1 ? 'checked' : '' }}
-                               class="form-radio h-4 w-4 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-700">Aktif</span>
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="radio"
-                               name="tipe_aktif"
-                               value="0"
-                               {{ old('tipe_aktif', $tipe['tipe_aktif']) == 0 ? 'checked' : '' }}
-                               class="form-radio h-4 w-4 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-700">Nonaktif</span>
-                    </label>
+            <div class="mb-4">
+                <label class="form-label">Status <span class="text-danger">*</span></label>
+                <div class="d-flex gap-4 mt-2">
+                    <div class="form-check">
+                        <input class="form-check-input border-success" type="radio" name="tipe_aktif" value="1"
+                            id="aktif" {{ old('tipe_aktif', $tipe['tipe_aktif']) == 1 ? 'checked' : '' }}>
+                        <label class="form-check-label text-success fw-medium" for="aktif">Aktif</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input border-secondary" type="radio" name="tipe_aktif" value="0"
+                            id="nonaktif" {{ old('tipe_aktif', $tipe['tipe_aktif']) == 0 ? 'checked' : '' }}>
+                        <label class="form-check-label text-secondary fw-medium" for="nonaktif">Nonaktif</label>
+                    </div>
                 </div>
-                @error('tipe_aktif')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
             </div>
 
-            {{-- Info Tambahan --}}
-            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h3 class="text-sm font-medium text-gray-700 mb-2">Informasi</h3>
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <span class="text-gray-500">Dibuat:</span>
-                        <span class="text-gray-700 ml-2">
+            {{-- Informasi Tambahan --}}
+            <div class="mb-4 p-3 bg-gray-50 rounded-3 border">
+                <h6 class="text-primary fw-semibold mb-2">Informasi Tambahan</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-secondary d-block">Dibuat:</small>
+                        <span class="fw-medium">
                             {{ \Carbon\Carbon::parse($tipe['created_at'])->format('d M Y H:i') }}
                         </span>
                     </div>
-                    <div>
-                        <span class="text-gray-500">Terakhir Diubah:</span>
-                        <span class="text-gray-700 ml-2">
+                    <div class="col-md-6">
+                        <small class="text-secondary d-block">Terakhir Diubah:</small>
+                        <span class="fw-medium">
                             {{ \Carbon\Carbon::parse($tipe['updated_at'])->format('d M Y H:i') }}
                         </span>
                     </div>
                 </div>
             </div>
 
-            {{-- Action Buttons --}}
-            <div class="flex items-center justify-end space-x-3 pt-4 border-t">
-                <a href="{{ route('tipe.index') }}"
-                   class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                    Batal
+            {{-- Tombol --}}
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ route('tipe.index') }}" class="btn btn-secondary btn-rounded">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Batal
                 </a>
-                <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    Perbarui
+                <button type="submit" class="btn btn-primary btn-rounded">
+                    <i class="bi bi-save2 me-1"></i> Perbarui
                 </button>
             </div>
         </form>
     </div>
+</div>
+
 </div>
 @endsection

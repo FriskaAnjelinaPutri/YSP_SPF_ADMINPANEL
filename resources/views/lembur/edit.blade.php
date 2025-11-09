@@ -7,32 +7,99 @@
 
     {{-- Custom Styles --}}
     <style>
-        body {
-            background-color: #f8fafc;
-            font-family: 'Poppins', sans-serif;
-        }
-        .card {
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-        }
-        .card-header {
-            border-top-left-radius: 15px !important;
-            border-top-right-radius: 15px !important;
-            background-color: #118ab2 !important;
-        }
-        .btn-rounded {
-            border-radius: 50px;
-        }
-        label.form-label {
-            color: #2b2d42;
-            font-weight: 600;
-        }
-        .form-control:disabled {
-            background-color: #e9ecef;
-            opacity: 1;
-        }
-    </style>
+    /* === Konsistensi Warna & Font === */
+    body {
+        background-color: #f4f6f9 !important; /* warna background sama seperti dashboard */
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* === Card === */
+    .card {
+        border-radius: 18px !important;
+        border: none;
+        background: #fff;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-header {
+        background: linear-gradient(90deg, #118ab2, #06aed5);
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.05rem;
+        letter-spacing: 0.3px;
+        padding: 0.9rem 1.25rem;
+    }
+
+    /* === Label & Input === */
+    label.form-label {
+        color: #2b2d42;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #118ab2;
+        box-shadow: 0 0 0 0.15rem rgba(17, 138, 178, 0.25);
+    }
+
+    /* === Button === */
+    .btn {
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background-color: #118ab2;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #0f7b9f;
+    }
+
+    .btn-secondary {
+        background-color: #adb5bd;
+        border: none;
+    }
+
+    .btn-rounded {
+        border-radius: 50px;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    /* === Alert Styling === */
+    .alert {
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    /* === Heading Section === */
+    h3.fw-bold.text-primary {
+        color: #118ab2 !important;
+        letter-spacing: 0.3px;
+    }
+    small.text-muted {
+        font-size: 0.85rem;
+    }
+
+    /* === Responsive Spacing === */
+    .container-fluid.py-4 {
+        padding-top: 2.5rem !important;
+        padding-bottom: 2.5rem !important;
+    }
+
+    /* === Smooth Transition === */
+    .card, .form-control, .btn, .alert {
+        transition: all 0.25s ease-in-out;
+    }
+</style>
+
 
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -46,6 +113,7 @@
             <i class="bi bi-arrow-left-circle me-1"></i> Kembali
         </a>
     </div>
+    
 
     {{-- Alerts --}}
     @if ($errors->any())

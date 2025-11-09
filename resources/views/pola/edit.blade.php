@@ -3,61 +3,158 @@
 @section('title', 'Edit Pola')
 
 @section('content')
-<div class="container mx-auto py-6">
-    <h1 class="text-2xl font-bold mb-6">Edit Pola</h1>
+<div class="container-fluid">
 
-    @if (session('error'))
-        <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
-            {{ session('error') }}
-        </div>
-    @endif
+<style>
+/* === General === */
+body {
+    background-color: #f0fdf4;
+    font-family: 'Poppins', sans-serif;
+}
+h3, h5 { font-weight: 600; }
+.text-primary { color: #166534 !important; }
+.text-secondary { color: #6b7280 !important; }
 
-    <form action="{{ route('pola.update', $pola['pola_kode']) }}" method="POST" class="bg-white shadow-md rounded p-6">
-        @csrf
-        @method('PUT')
+/* === Card === */
+.card {
+    border-radius: 20px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+.card:hover { transform: translateY(-3px); }
+.card-header {
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    color: #fff;
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+}
 
-        {{-- Pilih Tipe --}}
-        <div class="mb-4">
-            <label for="tipe_kode" class="block font-medium text-gray-700">Tipe</label>
-            <select name="tipe_kode" id="tipe_kode" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">-- Pilih Tipe --</option>
-                @foreach ($tipes as $tipe)
-                    <option value="{{ $tipe['tipe_kode'] }}" {{ $pola['tipe_kode'] == $tipe['tipe_kode'] ? 'selected' : '' }}>
-                        {{ $tipe['tipe_nama'] }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+/* === Buttons === */
+.btn-rounded {
+    border-radius: 50px;
+    transition: transform 0.2s ease;
+}
+.btn-rounded:hover { transform: scale(1.05); }
 
-        {{-- Pilih Jadwal --}}
-        <div class="mb-4">
-            <label for="jadwal_kode" class="block font-medium text-gray-700">Jadwal</label>
-            <select name="jadwal_kode" id="jadwal_kode" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                <option value="">-- Pilih Jadwal --</option>
-                @foreach ($jadwals as $jadwal)
-                    <option value="{{ $jadwal['jadwal_kode'] }}" {{ $pola['jadwal_kode'] == $jadwal['jadwal_kode'] ? 'selected' : '' }}>
-                        {{ $jadwal['jadwal_nama'] ?? $jadwal['jadwal_kode'] }}
-                        ({{ $jadwal['jam_mulai'] }} - {{ $jadwal['jam_selesai'] }})
-                    </option>
-                @endforeach
-            </select>
-        </div>
+.btn-primary {
+    background-color: #22c55e;
+    border: none;
+}
+.btn-primary:hover { background-color: #16a34a; }
 
-        {{-- Urutan --}}
-        <div class="mb-4">
-            <label for="urut" class="block font-medium text-gray-700">Urutan</label>
-            <input type="number" name="urut" id="urut" value="{{ $pola['urut'] }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-        </div>
+.btn-secondary {
+    background-color: #6b7280;
+    border: none;
+}
+.btn-secondary:hover { background-color: #4b5563; }
 
-        {{-- Tombol --}}
-        <div class="flex justify-end space-x-2">
-            <a href="{{ route('pola.index') }}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-                Kembali
-            </a>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                Update
-            </button>
-        </div>
-    </form>
+/* === Form === */
+.form-label {
+    font-weight: 500;
+    color: #166534;
+}
+.form-select, .form-control {
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+}
+.form-select:focus, .form-control:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 0.15rem rgba(34,197,94,0.25);
+}
+
+/* === Alert === */
+.alert {
+    border-radius: 15px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+}
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+</style>
+
+{{-- Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-primary mb-0">
+            <i class="bi bi-pencil-square me-2"></i>Edit Pola Kerja
+        </h3>
+        <small class="text-secondary">Perbarui data pola kerja sesuai kebutuhan</small>
+    </div>
+    <a href="{{ route('pola.index') }}" class="btn btn-secondary btn-rounded shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Kembali
+    </a>
+</div>
+
+{{-- Alert Error --}}
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+{{-- Form Card --}}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Form Edit Pola</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('pola.update', $pola['pola_kode']) }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            {{-- Pilih Tipe --}}
+            <div class="mb-4">
+                <label for="tipe_kode" class="form-label">Tipe <span class="text-danger">*</span></label>
+                <select name="tipe_kode" id="tipe_kode" class="form-select" required>
+                    <option value="">-- Pilih Tipe --</option>
+                    @foreach ($tipes as $tipe)
+                        <option value="{{ $tipe['tipe_kode'] }}"
+                            {{ $pola['tipe_kode'] == $tipe['tipe_kode'] ? 'selected' : '' }}>
+                            {{ $tipe['tipe_nama'] }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Pilih Jadwal --}}
+            <div class="mb-4">
+                <label for="jadwal_kode" class="form-label">Jadwal <span class="text-danger">*</span></label>
+                <select name="jadwal_kode" id="jadwal_kode" class="form-select" required>
+                    <option value="">-- Pilih Jadwal --</option>
+                    @foreach ($jadwals as $jadwal)
+                        <option value="{{ $jadwal['jadwal_kode'] }}"
+                            {{ $pola['jadwal_kode'] == $jadwal['jadwal_kode'] ? 'selected' : '' }}>
+                            {{ $jadwal['jadwal_nama'] ?? $jadwal['jadwal_kode'] }}
+                            ({{ $jadwal['jam_mulai'] }} - {{ $jadwal['jam_selesai'] }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Urutan --}}
+            <div class="mb-4">
+                <label for="urut" class="form-label">Urutan <span class="text-danger">*</span></label>
+                <input type="number" name="urut" id="urut" value="{{ $pola['urut'] }}"
+                       class="form-control" placeholder="Masukkan urutan" required>
+            </div>
+
+            {{-- Tombol --}}
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ route('pola.index') }}" class="btn btn-secondary btn-rounded">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Batal
+                </a>
+                <button type="submit" class="btn btn-primary btn-rounded">
+                    <i class="bi bi-save2 me-1"></i> Update
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </div>
 @endsection

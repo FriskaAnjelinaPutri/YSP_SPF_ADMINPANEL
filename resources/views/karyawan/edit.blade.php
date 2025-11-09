@@ -8,22 +8,26 @@
     {{-- ==================== CUSTOM STYLES ==================== --}}
     <style>
         body {
-            background-color: #f8fafc;
+            background-color: #f0fdf4;
             font-family: 'Poppins', sans-serif;
         }
 
         .card {
             border-radius: 15px;
             border: none;
+            animation: fadeInUp 0.5s ease;
         }
 
         .card-header {
             border-top-left-radius: 15px !important;
             border-top-right-radius: 15px !important;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            color: #fff;
+            font-weight: 600;
         }
 
         .shadow-soft {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
         }
 
         .fw-semibold {
@@ -39,10 +43,28 @@
             transform: translateY(-2px);
         }
 
+        .btn-primary {
+            background-color: #22c55e;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #16a34a;
+        }
+
+        .btn-secondary {
+            background-color: #9ca3af;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #6b7280;
+        }
+
         .form-control:focus,
         .form-select:focus {
-            box-shadow: none;
-            border-color: #118ab2;
+            box-shadow: 0 0 0 0.25rem rgba(34,197,94,0.25);
+            border-color: #22c55e;
         }
 
         small.text-muted {
@@ -52,20 +74,32 @@
         }
 
         label.form-label {
-            color: #2b2d42;
+            color: #166534;
         }
 
         .form-section-title {
             font-size: 1.1rem;
-            color: #118ab2;
+            color: #16a34a;
             margin-top: 1.2rem;
             font-weight: 600;
             border-bottom: 2px solid #e5e7eb;
             padding-bottom: 0.4rem;
         }
 
-        .bg-sp-primary {
-            background-color: #118ab2 !important;
+        .alert {
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
         }
 
         .alert ul {
@@ -73,12 +107,23 @@
             margin-bottom: 0;
             padding-left: 1.3rem;
         }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 
     {{-- ==================== HEADER ==================== --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold text-primary mb-0">
+            <h3 class="fw-bold text-success mb-0">
                 <i class="bi bi-pencil-square me-2"></i>Edit Karyawan
             </h3>
             <small class="text-muted">Perbarui data karyawan sesuai kebutuhan</small>

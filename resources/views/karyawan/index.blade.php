@@ -9,18 +9,19 @@
 <style>
 /* === General === */
 body {
-    background-color: #f4f6f9;
+    background-color: #f0fdf4;
     font-family: 'Poppins', sans-serif;
 }
 h3, h5 { font-weight: 600; }
-.text-primary { color: #118ab2 !important; }
-.text-secondary { color: #6c757d !important; }
+.text-primary { color: #166534 !important; }
+.text-secondary { color: #6b7280 !important; }
 
 /* === Card === */
 .card {
     border-radius: 20px;
     transition: all 0.3s ease;
     background: #fff;
+    border: none;
 }
 .card:hover {
     transform: translateY(-3px);
@@ -29,22 +30,30 @@ h3, h5 { font-weight: 600; }
 .card-header {
     border-top-left-radius: 20px !important;
     border-top-right-radius: 20px !important;
-    background: linear-gradient(90deg, #118ab2, #06d6a0);
+    background: linear-gradient(90deg, #16a34a, #22c55e);
     color: #fff;
 }
 
 /* === Table === */
 .table-hover tbody tr:hover {
-    background-color: rgba(17,138,178,0.08);
+    background-color: rgba(22,101,52,0.08);
     transition: background-color 0.2s ease;
     cursor: pointer;
 }
+.table-hover tr.active-row {
+    background-color: #dcfce7 !important;
+    transition: background-color 0.3s ease;
+}
+
 .table th, .table td {
     vertical-align: middle;
     padding: 12px 15px;
 }
-.table td strong { font-size: 0.95rem; }
-.table td small { font-size: 0.75rem; color: #6c757d; }
+.table thead {
+    background-color: #dcfce7;
+}
+.table td strong { font-size: 0.95rem; color: #14532d; }
+.table td small { font-size: 0.75rem; color: #6b7280; }
 
 /* === Badges === */
 .badge {
@@ -54,10 +63,10 @@ h3, h5 { font-weight: 600; }
     font-weight: 500;
     text-transform: capitalize;
 }
-.badge-success { background: linear-gradient(45deg,#06d6a0,#118ab2); color: #fff; }
-.badge-warning { background: linear-gradient(45deg,#ffd166,#ef476f); color: #fff; }
-.badge-primary { background: linear-gradient(45deg,#118ab2,#06d6a0); color: #fff; }
-.badge-danger { background: linear-gradient(45deg,#ef476f,#ffd166); color: #fff; }
+.badge-success { background: #22c55e; color: #fff; }
+.badge-warning { background: #facc15; color: #000; }
+.badge-primary { background: #16a34a; color: #fff; }
+.badge-danger { background: #dc2626; color: #fff; }
 
 /* === Buttons === */
 .btn-rounded {
@@ -65,7 +74,37 @@ h3, h5 { font-weight: 600; }
     transition: transform 0.2s ease;
 }
 .btn-rounded:hover { transform: scale(1.05); }
-td.text-center .btn { margin-bottom: 2px; }
+
+.btn-primary {
+    background-color: #22c55e;
+    border: none;
+}
+.btn-primary:hover { background-color: #16a34a; }
+
+.btn-outline-info {
+    border-color: #22c55e;
+    color: #22c55e;
+}
+.btn-outline-info:hover {
+    background-color: #22c55e;
+    color: white;
+}
+.btn-outline-warning {
+    border-color: #facc15;
+    color: #ca8a04;
+}
+.btn-outline-warning:hover {
+    background-color: #facc15;
+    color: black;
+}
+.btn-outline-danger {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+.btn-outline-danger:hover {
+    background-color: #dc2626;
+    color: white;
+}
 
 /* === Search === */
 #searchInput {
@@ -73,17 +112,28 @@ td.text-center .btn { margin-bottom: 2px; }
     border-radius: 50px 0 0 50px;
     border-right: none;
 }
-#searchInput:focus { box-shadow: 0 0 10px rgba(17,138,178,0.3); }
+#searchInput:focus { box-shadow: 0 0 10px rgba(22,101,52,0.3); }
 #searchForm button {
     border-radius: 0 50px 50px 0;
     border-left: none;
+    background-color: #22c55e;
+    color: #fff;
 }
+#searchForm button:hover { background-color: #16a34a; }
 
 /* === Alerts === */
 .alert {
     border-radius: 15px;
     padding: 12px 18px;
     font-size: 0.9rem;
+}
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
 }
 
 /* === Modal === */
@@ -93,7 +143,7 @@ td.text-center .btn { margin-bottom: 2px; }
     transition: transform 0.3s ease;
 }
 .modal-header {
-    background: linear-gradient(90deg,#118ab2,#06d6a0);
+    background: linear-gradient(90deg,#16a34a,#22c55e);
     color: #fff;
     border-bottom: none;
 }
@@ -104,10 +154,19 @@ td.text-center .btn { margin-bottom: 2px; }
 .modal-body table th {
     width: 180px;
     font-weight: 600;
-    color: #118ab2;
+    color: #166534;
 }
 .modal-body table td { word-break: break-word; }
 .modal-footer .btn-rounded { min-width: 100px; }
+
+.modal-content {
+    animation: slideDown 0.4s ease;
+}
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
 
 /* === Spinner === */
 .spinner-wrapper {
@@ -116,7 +175,7 @@ td.text-center .btn { margin-bottom: 2px; }
     align-items: center;
     justify-content: center;
     min-height: 200px;
-    color: #118ab2;
+    color: #16a34a;
 }
 
 /* === Responsive === */
@@ -125,7 +184,18 @@ td.text-center .btn { margin-bottom: 2px; }
     .modal-body table td { font-size: 0.75rem; }
     #searchForm { width: 100% !important; }
 }
+
+@media (max-width: 576px) {
+  table td:nth-child(2),
+  table th:nth-child(2),
+  table td:nth-child(3),
+  table th:nth-child(3) {
+    display: none;
+  }
+}
+
 </style>
+
 
 
     {{-- Header --}}
@@ -354,6 +424,15 @@ document.addEventListener('DOMContentLoaded', function() {
             spinner.innerHTML = `<p class="text-danger">Gagal memuat data. Coba lagi.</p>`;
             content.classList.add('d-none');
         });
+
+        // Highlight baris aktif saat tombol detail diklik
+        document.querySelectorAll('[data-kar_kode]').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('.active-row').forEach(r => r.classList.remove('active-row'));
+                e.target.closest('tr').classList.add('active-row');
+            });
+        });
+
     });
 });
 </script>

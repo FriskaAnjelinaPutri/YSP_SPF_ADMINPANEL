@@ -3,133 +3,178 @@
 @section('title', 'Manajemen Tipe')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    {{-- Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800">Daftar Tipe</h1>
-            <p class="text-gray-500 text-sm">Kelola tipe pola kerja karyawan</p>
-        </div>
-        <div class="mt-4 sm:mt-0">
-            <a href="{{ route('tipe.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 shadow transition duration-150">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 4v16m8-8H4" />
-                </svg>
-                Tambah Tipe
-            </a>
-        </div>
+<div class="container-fluid">
+
+<style>
+/* === General === */
+body {
+    background-color: #f0fdf4;
+    font-family: 'Poppins', sans-serif;
+}
+h3, h5 { font-weight: 600; }
+.text-primary { color: #166534 !important; }
+.text-secondary { color: #6b7280 !important; }
+
+/* === Card === */
+.card {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    background: #fff;
+    border: none;
+}
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+.card-header {
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    color: #fff;
+}
+
+/* === Buttons === */
+.btn-rounded {
+    border-radius: 50px;
+    transition: transform 0.2s ease;
+}
+.btn-rounded:hover { transform: scale(1.05); }
+
+.btn-primary {
+    background-color: #22c55e;
+    border: none;
+}
+.btn-primary:hover { background-color: #16a34a; }
+
+.btn-outline-danger {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+.btn-outline-danger:hover {
+    background-color: #dc2626;
+    color: white;
+}
+
+/* === Table === */
+.table-hover tbody tr:hover {
+    background-color: rgba(22,101,52,0.08);
+    transition: background-color 0.2s ease;
+}
+.table th, .table td {
+    vertical-align: middle;
+    padding: 12px 15px;
+}
+.table thead {
+    background-color: #dcfce7;
+}
+.table td strong { font-size: 0.95rem; color: #14532d; }
+.table td small { font-size: 0.75rem; color: #6b7280; }
+
+/* === Alerts === */
+.alert {
+    border-radius: 15px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+}
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .table th, .table td {
+        font-size: 0.85rem;
+    }
+}
+</style>
+
+{{-- Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-primary mb-0">
+            <i class="bi bi-tags-fill me-2"></i>Daftar Tipe
+        </h3>
+        <small class="text-secondary">Kelola tipe pola kerja karyawan</small>
+    </div>
+    <a href="{{ route('tipe.create') }}" class="btn btn-primary shadow-sm btn-rounded">
+        <i class="bi bi-plus-circle me-1"></i> Tambah Tipe
+    </a>
+</div>
+
+{{-- Alerts --}}
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show shadow-soft" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show shadow-soft" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+{{-- Card Table --}}
+<div class="card border-0 shadow-soft mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-list-task me-2"></i>Data Tipe
+        </h5>
     </div>
 
-    {{-- Alert Success --}}
-    @if (session('success'))
-        <div class="mb-4 rounded-md bg-green-100 p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3 text-sm text-green-700">
-                    {{ session('success') }}
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- Alert Error --}}
-    @if (session('error'))
-        <div class="mb-4 rounded-md bg-red-100 p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                              clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3 text-sm text-red-700">
-                    {{ session('error') }}
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- Table --}}
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        <div class="p-4">
-            <table id="tipeTable" class="min-w-full text-sm text-left text-gray-600">
-                <thead class="bg-gray-100 text-gray-800 uppercase text-xs font-semibold">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table id="tipeTable" class="table table-hover align-middle mb-0">
+                <thead class="text-white">
                     <tr>
-                        <th class="px-4 py-3">#</th>
-                        <th class="px-4 py-3">Kode Tipe</th>
-                        <th class="px-4 py-3">Nama Tipe</th>
-                        <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3">Dibuat</th>
-                        <th class="px-4 py-3 text-center">Aksi</th>
+                        <th>#</th>
+                        <th>Kode Tipe</th>
+                        <th>Nama Tipe</th>
+                        <th>Status</th>
+                        <th>Dibuat</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($tipes as $index => $tipe)
-                        <tr class="border-b hover:bg-gray-50 transition">
-                            <td class="px-4 py-3 text-gray-700">{{ $index + 1 }}</td>
-                            <td class="px-4 py-3 font-semibold text-gray-900">{{ $tipe['tipe_kode'] }}</td>
-                            <td class="px-4 py-3">{{ $tipe['tipe_nama'] }}</td>
-                            <td class="px-4 py-3">
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td><strong>{{ $tipe['tipe_kode'] }}</strong></td>
+                            <td>{{ $tipe['tipe_nama'] }}</td>
+                            <td>
                                 @if($tipe['tipe_aktif'])
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Aktif
-                                    </span>
+                                    <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill">Aktif</span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        Nonaktif
-                                    </span>
+                                    <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill">Nonaktif</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-gray-500 text-sm">
-                                {{ \Carbon\Carbon::parse($tipe['created_at'])->format('d M Y') }}
-                            </td>
-                            <td class="px-4 py-3 text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('tipe.edit', $tipe['tipe_kode']) }}"
-                                       class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                             viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                        </svg>
-                                        Edit
-                                    </a>
-
-                                    <form action="{{ route('tipe.destroy', $tipe['tipe_kode']) }}" method="POST"
-                                          onsubmit="return confirm('Yakin ingin menghapus tipe {{ $tipe['tipe_nama'] }}?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-600 rounded hover:bg-red-200 transition">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </div>
+                            <td><small>{{ \Carbon\Carbon::parse($tipe['created_at'])->format('d M Y') }}</small></td>
+                            <td class="text-center">
+                                <a href="{{ route('tipe.edit', $tipe['tipe_kode']) }}"
+                                   class="btn btn-sm btn-outline-warning me-1 btn-rounded" title="Edit">
+                                   <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <form action="{{ route('tipe.destroy', $tipe['tipe_kode']) }}" method="POST"
+                                      class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger btn-rounded"
+                                            onclick="return confirm('Yakin ingin menghapus tipe {{ $tipe['tipe_nama'] }}?')" title="Hapus">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-gray-500 py-8">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                </svg>
-                                <p class="mt-2">Tidak ada data tipe kerja.</p>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox me-2 fs-5"></i>Tidak ada data tipe kerja.
                             </td>
                         </tr>
                     @endforelse
@@ -138,30 +183,29 @@
         </div>
     </div>
 </div>
+</div>
 @endsection
 
 @section('scripts')
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if (window.jQuery && $.fn.DataTable) {
-            $('#tipeTable').DataTable({
-                responsive: true,
-                pageLength: 10,
-                order: [[1, 'asc']], // Sort by kode
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data per halaman",
-                    zeroRecords: "Tidak ditemukan data yang cocok",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Tidak ada data",
-                    infoFiltered: "(difilter dari _MAX_ total data)",
-                    paginate: {
-                        previous: "Sebelumnya",
-                        next: "Berikutnya"
-                    }
+document.addEventListener("DOMContentLoaded", function() {
+    if (window.jQuery && $.fn.DataTable) {
+        $('#tipeTable').DataTable({
+            responsive: true,
+            pageLength: 10,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data per halaman",
+                zeroRecords: "Tidak ditemukan data yang cocok",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                infoEmpty: "Tidak ada data",
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya"
                 }
-            });
-        }
-    });
+            }
+        });
+    }
+});
 </script>
 @endsection

@@ -3,116 +3,166 @@
 @section('title', 'Tambah Tipe')
 
 @section('content')
-<div class="container mx-auto px-6 py-8">
-    {{-- Header --}}
-    <div class="mb-6">
-        <div class="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-            <a href="{{ route('tipe.index') }}" class="hover:text-indigo-600">Tipe</a>
-            <span>/</span>
-            <span class="text-gray-700">Tambah Tipe</span>
-        </div>
-        <h1 class="text-2xl font-bold text-gray-800">Tambah Tipe Baru</h1>
+<div class="container-fluid">
+
+<style>
+/* === General Style === */
+body {
+    background-color: #f0fdf4;
+    font-family: 'Poppins', sans-serif;
+}
+h3, h5 { font-weight: 600; }
+.text-primary { color: #166534 !important; }
+.text-secondary { color: #6b7280 !important; }
+
+/* === Card === */
+.card {
+    border-radius: 20px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-3px);
+}
+.card-header {
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    color: #fff;
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+}
+
+/* === Buttons === */
+.btn-rounded {
+    border-radius: 50px;
+    transition: transform 0.2s ease;
+}
+.btn-rounded:hover { transform: scale(1.05); }
+
+.btn-primary {
+    background-color: #22c55e;
+    border: none;
+}
+.btn-primary:hover { background-color: #16a34a; }
+
+.btn-secondary {
+    background-color: #6b7280;
+    border: none;
+}
+.btn-secondary:hover { background-color: #4b5563; }
+
+/* === Form === */
+.form-label {
+    font-weight: 500;
+    color: #166534;
+}
+.form-select, .form-control {
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    box-shadow: none;
+}
+.form-select:focus, .form-control:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 0.15rem rgba(34,197,94,0.25);
+}
+
+/* === Alert === */
+.alert {
+    border-radius: 15px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+}
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+</style>
+
+{{-- Header --}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-primary mb-0">
+            <i class="bi bi-plus-circle me-2"></i>Tambah Tipe Baru
+        </h3>
+        <small class="text-secondary">Masukkan data tipe baru yang akan digunakan pada pola kerja</small>
     </div>
+    <a href="{{ route('tipe.index') }}" class="btn btn-secondary btn-rounded shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Kembali
+    </a>
+</div>
 
-    {{-- Alert Error --}}
-    @if (session('error'))
-        <div class="mb-4 rounded-md bg-red-100 p-4">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                              clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3 text-sm text-red-700">
-                    {{ session('error') }}
-                </div>
-            </div>
-        </div>
-    @endif
+{{-- Alert Error --}}
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
 
-    {{-- Form --}}
-    <div class="bg-white shadow rounded-lg">
-        <form action="{{ route('tipe.store') }}" method="POST" class="p-6">
+{{-- Form Card --}}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Form Tambah Tipe</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('tipe.store') }}" method="POST">
             @csrf
 
             {{-- Info Auto Generate --}}
-            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-blue-700">
-                            <strong>Kode tipe akan digenerate otomatis</strong> oleh sistem setelah data disimpan.
-                        </p>
-                    </div>
+            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
+                    <p class="text-sm text-primary mb-0">
+                        <strong>Kode tipe</strong> akan digenerate otomatis oleh sistem setelah data disimpan.
+                    </p>
                 </div>
             </div>
 
             {{-- Nama Tipe --}}
-            <div class="mb-6">
-                <label for="tipe_nama" class="block text-sm font-medium text-gray-700 mb-2">
-                    Nama Tipe <span class="text-red-500">*</span>
-                </label>
-                <input type="text"
-                       name="tipe_nama"
-                       id="tipe_nama"
+            <div class="mb-4">
+                <label for="tipe_nama" class="form-label">Nama Tipe <span class="text-danger">*</span></label>
+                <input type="text" name="tipe_nama" id="tipe_nama"
+                       class="form-control @error('tipe_nama') is-invalid @enderror"
                        value="{{ old('tipe_nama') }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 @error('tipe_nama') border-red-500 @enderror"
                        placeholder="Contoh: Shift Pagi"
                        maxlength="100"
                        required>
                 @error('tipe_nama')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror
-                <p class="mt-1 text-xs text-gray-500">Maksimal 100 karakter</p>
+                <small class="text-secondary">Maksimal 100 karakter</small>
             </div>
 
             {{-- Status Aktif --}}
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Status <span class="text-red-500">*</span>
-                </label>
-                <div class="flex items-center space-x-6">
-                    <label class="inline-flex items-center">
-                        <input type="radio"
-                               name="tipe_aktif"
-                               value="1"
-                               {{ old('tipe_aktif', '1') == '1' ? 'checked' : '' }}
-                               class="form-radio h-4 w-4 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-700">Aktif</span>
-                    </label>
-                    <label class="inline-flex items-center">
-                        <input type="radio"
-                               name="tipe_aktif"
-                               value="0"
-                               {{ old('tipe_aktif') == '0' ? 'checked' : '' }}
-                               class="form-radio h-4 w-4 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-700">Nonaktif</span>
-                    </label>
+            <div class="mb-4">
+                <label class="form-label">Status <span class="text-danger">*</span></label>
+                <div class="d-flex align-items-center gap-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipe_aktif" id="aktif" value="1"
+                               {{ old('tipe_aktif', '1') == '1' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="aktif">Aktif</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipe_aktif" id="nonaktif" value="0"
+                               {{ old('tipe_aktif') == '0' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="nonaktif">Nonaktif</label>
+                    </div>
                 </div>
-                @error('tipe_aktif')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
             </div>
 
-            {{-- Action Buttons --}}
-            <div class="flex items-center justify-end space-x-3 pt-4 border-t">
-                <a href="{{ route('tipe.index') }}"
-                   class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
-                    Batal
+            {{-- Tombol --}}
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ route('tipe.index') }}" class="btn btn-secondary btn-rounded">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Batal
                 </a>
-                <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    Simpan
+                <button type="submit" class="btn btn-primary btn-rounded">
+                    <i class="bi bi-save2 me-1"></i> Simpan
                 </button>
             </div>
         </form>
     </div>
 </div>
 
+</div>
 @endsection
