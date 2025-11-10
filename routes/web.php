@@ -35,6 +35,7 @@ Route::middleware(['admin'])->group(function () {
     Route::put('/absensi/{absensi}', [AbsensiController::class, 'update'])->name('absensi.update');
     Route::delete('/absensi/{absensi}', [AbsensiController::class, 'destroy'])->name('absensi.destroy');
     Route::get('/absensi/export', [AbsensiController::class, 'export'])->name('absensi.export');
+    Route::get('/absensi/statistics', [AbsensiController::class, 'getStatistics'])->name('absensi.statistics');
 
     // Cuti Management
     Route::get('/cuti', [CutiController::class, 'index'])->name('cuti.index');

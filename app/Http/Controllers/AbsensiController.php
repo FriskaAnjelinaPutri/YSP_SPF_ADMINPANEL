@@ -12,7 +12,7 @@ class AbsensiController extends Controller
 {
     private function apiBase()
     {
-        return env('API_URL');
+        return env('API_URL', 'http://127.0.0.1:8000/api');
     }
 
     private function token()
@@ -31,13 +31,17 @@ class AbsensiController extends Controller
 
         try {
             $periode = $request->get('periode', Carbon::now()->format('Y-m'));
-            $karyawanId = $request->get('karyawan_id');
+            $kar_kode = $request->get('kar_kode');
+            $status = $request->get('status');
 
-            $url = $this->apiBase() . '/admin/absensi';
+            $url = $this->apiBase() . '/absensi';
             $params = ['periode' => $periode];
 
-            if ($karyawanId) {
-                $params['karyawan_id'] = $karyawanId;
+            if ($kar_kode) {
+                $params['kar_kode'] = $kar_kode;
+            }
+            if ($status) {
+                $params['status'] = $status;
             }
 
             $response = Http::withToken($this->token())
@@ -45,10 +49,15 @@ class AbsensiController extends Controller
                 ->get($url, $params);
 
             if ($response->failed()) {
-                Log::error('Gagal mengambil data absensi', ['body' => $response->body()]);
+                Log::error('Gagal mengambil data absensi', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
                 return view('absensi.index', [
                     'absensis' => [],
                     'periode' => $periode,
+                    'summary' => [],
+                    'karyawans' => [],
                     'error' => 'Gagal mengambil data absensi dari API',
                 ]);
             }
@@ -65,92 +74,111 @@ class AbsensiController extends Controller
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
 
-            return view('absensi.index', compact('absensis', 'periode', 'summary', 'karyawans'));
+            return view('absensi.index', compact('absensis', 'periode', 'summary', 'karyawans', 'kar_kode', 'status'));
 
         } catch (\Exception $e) {
             Log::error('Error saat mengambil data absensi', ['error' => $e->getMessage()]);
             return view('absensi.index', [
                 'absensis' => [],
                 'periode' => Carbon::now()->format('Y-m'),
-                'error' => 'Terjadi kesalahan saat mengambil data',
+                'summary' => [],
+                'karyawans' => [],
+                'error' => 'Terjadi kesalahan saat mengambil data: ' . $e->getMessage(),
             ]);
         }
     }
 
-    /**
-     * Show the form for creating a new absensi
-     */
-    public function create()
-    {
-        if (!$this->token()) {
-            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
-        }
+    // /**
+    //  * Show the form for creating a new absensi
+    //  */
+    // public function create()
+    // {
+    //     if (!$this->token()) {
+    //         return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
+    //     }
 
-        try {
-            // Get list karyawan
-            $response = Http::withToken($this->token())
-                ->acceptJson()
-                ->get($this->apiBase() . '/karyawan');
+    //     try {
+    //         // Get list karyawan
+    //         $response = Http::withToken($this->token())
+    //             ->acceptJson()
+    //             ->get($this->apiBase() . '/karyawan');
 
-            $karyawans = $response->successful() ?
-                ($response->json()['data'] ?? []) : [];
+    //         $karyawans = $response->successful() ?
+    //             ($response->json()['data'] ?? []) : [];
 
-            return view('absensi.create', compact('karyawans'));
+    //         return view('absensi.create', compact('karyawans'));
 
-        } catch (\Exception $e) {
-            Log::error('Error saat load form create absensi', ['error' => $e->getMessage()]);
-            return redirect()->route('absensi.index')
-                ->with('error', 'Terjadi kesalahan saat memuat form');
-        }
-    }
+    //     } catch (\Exception $e) {
+    //         Log::error('Error saat load form create absensi', ['error' => $e->getMessage()]);
+    //         return redirect()->route('absensi.index')
+    //             ->with('error', 'Terjadi kesalahan saat memuat form');
+    //     }
+    // }
 
-    /**
-     * Store a newly created absensi
-     */
-    public function store(Request $request)
-    {
-        if (!$this->token()) {
-            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
-        }
+    // /**
+    //  * Store a newly created absensi
+    //  */
+    // public function store(Request $request)
+    // {
+    //     if (!$this->token()) {
+    //         return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
+    //     }
 
-        $request->validate([
-            'karyawan_id' => 'required|integer',
-            'tanggal' => 'required|date',
-            'check_in' => 'required|date_format:H:i',
-            'check_out' => 'nullable|date_format:H:i',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'status' => 'required|in:Hadir,Terlambat,Izin,Sakit,Alpha',
-            'keterangan' => 'nullable|string|max:500'
-        ]);
+    //     $request->validate([
+    //         'kar_kode' => 'required|integer',
+    //         'tanggal' => 'required|date',
+    //         'check_in' => 'required|date_format:H:i',
+    //         'check_out' => 'nullable|date_format:H:i',
+    //         'latitude' => 'required|numeric',
+    //         'longitude' => 'required|numeric',
+    //         'status' => 'required|in:Hadir,Terlambat,Izin,Sakit,Alpha',
+    //         'keterangan' => 'nullable|string|max:500'
+    //     ], [
+    //         'kar_kode.required' => 'Karyawan wajib dipilih',
+    //         'tanggal.required' => 'Tanggal wajib diisi',
+    //         'check_in.required' => 'Jam check-in wajib diisi',
+    //         'latitude.required' => 'Latitude wajib diisi',
+    //         'longitude.required' => 'Longitude wajib diisi',
+    //         'status.required' => 'Status wajib dipilih',
+    //     ]);
 
-        try {
-            $response = Http::withToken($this->token())
-                ->acceptJson()
-                ->post($this->apiBase() . '/admin/absensi', [
-                    'karyawan_id' => $request->karyawan_id,
-                    'tanggal' => $request->tanggal,
-                    'check_in' => $request->check_in . ':00',
-                    'check_out' => $request->check_out ? $request->check_out . ':00' : null,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'status' => $request->status,
-                    'keterangan' => $request->keterangan,
-                ]);
+    //     try {
+    //         $payload = [
+    //             'kar_kode' => $request->kar_kode,
+    //             'tanggal' => $request->tanggal,
+    //             'check_in' => $request->check_in . ':00',
+    //             'check_out' => $request->check_out ? $request->check_out . ':00' : null,
+    //             'latitude' => $request->latitude,
+    //             'longitude' => $request->longitude,
+    //             'status' => $request->status,
+    //             'keterangan' => $request->keterangan,
+    //         ];
 
-            if ($response->successful()) {
-                return redirect()->route('absensi.index')
-                    ->with('success', 'Data absensi berhasil ditambahkan');
-            }
+    //         Log::info('Absensi Store Payload:', $payload);
 
-            $error = $response->json()['message'] ?? 'Gagal menyimpan data absensi';
-            return back()->withInput()->with('error', $error);
+    //         $response = Http::withToken($this->token())
+    //             ->acceptJson()
+    //             ->timeout(30)
+    //             ->post($this->apiBase() . '/absensi', $payload);
 
-        } catch (\Exception $e) {
-            Log::error('Error saat menyimpan absensi', ['error' => $e->getMessage()]);
-            return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data');
-        }
-    }
+    //         Log::info('Absensi Store Response:', [
+    //             'status' => $response->status(),
+    //             'body' => $response->body(),
+    //         ]);
+
+    //         if ($response->successful()) {
+    //             return redirect()->route('absensi.index')
+    //                 ->with('success', 'Data absensi berhasil ditambahkan');
+    //         }
+
+    //         $error = $response->json()['message'] ?? 'Gagal menyimpan data absensi';
+    //         return back()->withInput()->with('error', $error);
+
+    //     } catch (\Exception $e) {
+    //         Log::error('Error saat menyimpan absensi', ['error' => $e->getMessage()]);
+    //         return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
+    //     }
+    // }
 
     /**
      * Display the specified absensi
@@ -164,11 +192,14 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/' . $id);
+                ->get($this->apiBase() . '/absensi/' . $id);
 
             if ($response->successful()) {
-                $absensi = $response->json()['data'] ?? null;
-                return view('absensi.show', compact('absensi'));
+                $data = $response->json()['data'] ?? null;
+                $absensi = $data['absensi'] ?? null;
+                $durasi = $data['durasi_kerja'] ?? null;
+
+                return view('absensi.show', compact('absensi', 'durasi'));
             }
 
             return redirect()->route('absensi.index')
@@ -193,14 +224,15 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/' . $id);
+                ->get($this->apiBase() . '/absensi/' . $id);
 
             if ($response->failed()) {
                 return redirect()->route('absensi.index')
                     ->with('error', 'Data absensi tidak ditemukan');
             }
 
-            $absensi = $response->json()['data'] ?? null;
+            $data = $response->json()['data'] ?? [];
+            $absensi = $data['absensi'] ?? null;
 
             // Get list karyawan
             $karyawanResponse = Http::withToken($this->token())
@@ -229,25 +261,39 @@ class AbsensiController extends Controller
         }
 
         $request->validate([
-            'check_in' => 'required|date_format:H:i',
-            'check_out' => 'nullable|date_format:H:i',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'status' => 'required|in:Hadir,Terlambat,Izin,Sakit,Alpha',
             'keterangan' => 'nullable|string|max:500'
+        ], [
+            'latitude.required' => 'Latitude wajib diisi',
+            'longitude.required' => 'Longitude wajib diisi',
+            'status.required' => 'Status wajib dipilih',
         ]);
 
         try {
+            $payload = [
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
+                'status' => $request->status,
+                'keterangan' => $request->keterangan,
+            ];
+
+            Log::info('Absensi Update Payload:', [
+                'id' => $id,
+                'payload' => $payload
+            ]);
+
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->put($this->apiBase() . '/admin/absensi/' . $id, [
-                    'check_in' => $request->check_in . ':00',
-                    'check_out' => $request->check_out ? $request->check_out . ':00' : null,
-                    'latitude' => $request->latitude,
-                    'longitude' => $request->longitude,
-                    'status' => $request->status,
-                    'keterangan' => $request->keterangan,
-                ]);
+                ->timeout(30)
+                ->put($this->apiBase() . '/absensi/' . $id, $payload);
+
+            Log::info('Absensi Update Response:', [
+                'id' => $id,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
 
             if ($response->successful()) {
                 return redirect()->route('absensi.index')
@@ -259,7 +305,7 @@ class AbsensiController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error saat update absensi', ['error' => $e->getMessage()]);
-            return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data');
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
         }
     }
 
@@ -275,7 +321,13 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->delete($this->apiBase() . '/admin/absensi/' . $id);
+                ->delete($this->apiBase() . '/absensi/' . $id);
+
+            Log::info('Absensi Delete Response:', [
+                'id' => $id,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
 
             if ($response->successful()) {
                 return redirect()->route('absensi.index')
@@ -305,15 +357,25 @@ class AbsensiController extends Controller
 
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/admin/absensi/export', [
+                ->timeout(60)
+                ->get($this->apiBase() . '/absensi/export', [
                     'periode' => $periode
                 ]);
 
             if ($response->successful()) {
                 $filename = 'absensi_' . $periode . '.xlsx';
-                return response($response->body())
-                    ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
+                // Jika API mengembalikan file Excel
+                if ($response->header('Content-Type') === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+                    return response($response->body())
+                        ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                        ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+                }
+
+                // Jika API mengembalikan JSON (untuk sementara)
+                $data = $response->json();
+                return redirect()->route('absensi.index')
+                    ->with('success', 'Export berhasil. Total data: ' . count($data['data'] ?? []));
             }
 
             return back()->with('error', 'Gagal mengexport data absensi');
@@ -321,6 +383,50 @@ class AbsensiController extends Controller
         } catch (\Exception $e) {
             Log::error('Error saat export absensi', ['error' => $e->getMessage()]);
             return back()->with('error', 'Terjadi kesalahan saat export data');
+        }
+    }
+
+    /**
+     * Get absensi data for AJAX request (for charts/statistics)
+     */
+    public function getStatistics(Request $request)
+    {
+        if (!$this->token()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak ditemukan'
+            ], 401);
+        }
+
+        try {
+            $periode = $request->get('periode', Carbon::now()->format('Y-m'));
+
+            $response = Http::withToken($this->token())
+                ->acceptJson()
+                ->get($this->apiBase() . '/absensi', [
+                    'periode' => $periode
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json([
+                    'success' => true,
+                    'summary' => $data['summary'] ?? [],
+                    'data' => $data['data'] ?? []
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data statistik'
+            ], 500);
+
+        } catch (\Exception $e) {
+            Log::error('Error get statistics', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan'
+            ], 500);
         }
     }
 }
