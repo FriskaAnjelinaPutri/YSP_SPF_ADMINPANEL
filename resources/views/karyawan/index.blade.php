@@ -279,6 +279,33 @@
     </div>
 
 </div>
+@if(!empty($meta))
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+        <div class="text-secondary small mb-2 mb-md-0">
+            Menampilkan halaman {{ $meta['current_page'] }} dari {{ $meta['last_page'] }},
+            total {{ $meta['total'] }} data
+        </div>
+
+        <nav>
+            <ul class="pagination mb-0">
+                <li class="page-item {{ !$links['prev'] ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ $links['prev'] ? '?page=' . ($meta['current_page'] - 1) : '#' }}">«</a>
+                </li>
+
+                @for ($i = 1; $i <= $meta['last_page']; $i++)
+                    <li class="page-item {{ $meta['current_page'] == $i ? 'active' : '' }}">
+                        <a class="page-link" href="?page={{ $i }}">{{ $i }}</a>
+                    </li>
+                @endfor
+
+                <li class="page-item {{ !$links['next'] ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ $links['next'] ? '?page=' . ($meta['current_page'] + 1) : '#' }}">»</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+@endif
+
 
 {{-- Modal Detail Karyawan --}}
 <div class="modal fade" id="karyawanDetailModal" tabindex="-1" aria-labelledby="karyawanDetailModalLabel"
