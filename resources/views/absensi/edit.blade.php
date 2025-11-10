@@ -7,13 +7,86 @@
 
     {{-- Custom Styles --}}
     <style>
-        body { background-color: #f0fdf4; font-family: 'Poppins', sans-serif; }
-        .card { border-radius: 20px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card-header { background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #fff; border-top-left-radius: 20px; border-top-right-radius: 20px; }
-        .form-label { font-weight: 600; color: #166534; }
-        .btn-warning { background-color: #f59e0b; border-color: #f59e0b; }
-        .btn-warning:hover { background-color: #d97706; border-color: #d97706; }
+    /* Warna dan font */
+    body {
+        background-color: #f0fdf4 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Kartu */
+    .card {
+        border-radius: 20px !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Header card - gunakan warna oranye untuk edit, biru untuk detail */
+    .card-header {
+        border-top-left-radius: 20px !important;
+        border-top-right-radius: 20px !important;
+        font-weight: 600;
+        color: #fff;
+    }
+
+    /* Header edit khusus */
+    .card-header:has(h5:contains("Edit")) {
+        background: linear-gradient(90deg, #fbbf24, #f59e0b) !important;
+    }
+
+    /* Header detail khusus */
+    .card-header:has(h5:contains("Informasi")) {
+        background: linear-gradient(90deg, #3b82f6, #2563eb) !important;
+    }
+
+    /* Label dan teks */
+    .form-label {
+        font-weight: 600;
+        color: #166534;
+    }
+
+    h3, h5 {
+        font-weight: 600 !important;
+    }
+
+    /* Tombol */
+    .btn-rounded {
+        border-radius: 50px !important;
+        padding: 0.4rem 1.2rem !important;
+    }
+
+    .btn-outline-secondary {
+        border-color: #d1d5db !important;
+        color: #374151 !important;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #e5e7eb !important;
+        color: #111827 !important;
+    }
+
+    .btn-warning {
+        background-color: #f59e0b !important;
+        border-color: #f59e0b !important;
+        color: #fff !important;
+    }
+
+    .btn-warning:hover {
+        background-color: #d97706 !important;
+        border-color: #d97706 !important;
+    }
+
+    /* Tabel dan alert */
+    .alert {
+        border-radius: 12px !important;
+    }
+
+    .table th {
+        background-color: #f0fdf4 !important;
+        color: #166534 !important;
+        font-weight: 600 !important;
+    }
     </style>
+
 
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
