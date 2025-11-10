@@ -399,8 +399,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`{{ $apiBase ?? 'http://127.0.0.1:8000/api' }}/karyawan/${kar_kode}`, {
                 headers: {
                     'Authorization': 'Bearer {{ session('api_token') }}',
-                    'Accept': 'application/json'
-                }
+                    'Accept': 'application/json',
+                },
             })
             .then(response => response.json())
             .then(data => {

@@ -6,15 +6,127 @@
 <div class="container-fluid py-4">
 
     <style>
-        body { background-color: #f8fafc; font-family: 'Poppins', sans-serif; }
-        .card { border-radius: 15px; border: none; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-        .card-header { border-top-left-radius: 15px !important; border-top-right-radius: 15px !important; background-color: #118ab2 !important; }
-        .btn-rounded { border-radius: 50px; }
-        .badge-status { font-size: 0.8rem; padding: 0.4em 0.8em; }
-        .badge-pending { background-color: #ffc107; color: #fff; }
-        .badge-approved { background-color: #28a745; color: #fff; }
-        .badge-rejected { background-color: #dc3545; color: #fff; }
-    </style>
+/* === General === */
+body {
+    background-color: #f0fdf4;
+    font-family: 'Poppins', sans-serif;
+}
+h3, h5 { font-weight: 600; }
+.text-primary { color: #166534 !important; }
+.text-secondary { color: #6b7280 !important; }
+
+/* === Card === */
+.card {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    background: #fff;
+    border: none;
+}
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+.card-header {
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+    color: #fff;
+}
+
+/* === Table === */
+.table-hover tbody tr:hover {
+    background-color: rgba(22,101,52,0.08);
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+.table-hover tr.active-row {
+    background-color: #dcfce7 !important;
+    transition: background-color 0.3s ease;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    padding: 12px 15px;
+}
+.table thead {
+    background-color: #dcfce7;
+}
+.table td strong { font-size: 0.95rem; color: #14532d; }
+.table td small { font-size: 0.75rem; color: #6b7280; }
+
+/* === Badges === */
+.badge-status {
+    font-size: 0.75rem;
+    padding: 0.4em 0.8em;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+.badge-pending { background: #facc15; color: #000; }
+.badge-approved { background: #22c55e; color: #fff; }
+.badge-rejected { background: #dc2626; color: #fff; }
+
+/* === Buttons === */
+.btn-rounded {
+    border-radius: 50px;
+    transition: transform 0.2s ease;
+}
+.btn-rounded:hover { transform: scale(1.05); }
+
+.btn-primary {
+    background-color: #22c55e;
+    border: none;
+}
+.btn-primary:hover { background-color: #16a34a; }
+
+.btn-outline-warning {
+    border-color: #facc15;
+    color: #ca8a04;
+}
+.btn-outline-warning:hover {
+    background-color: #facc15;
+    color: black;
+}
+.btn-outline-danger {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+.btn-outline-danger:hover {
+    background-color: #dc2626;
+    color: white;
+}
+
+/* === Alerts === */
+.alert {
+    border-radius: 15px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+}
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.alert-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .table th, .table td {
+        font-size: 0.85rem;
+    }
+}
+@media (max-width: 576px) {
+    table th:nth-child(3),
+    table td:nth-child(3),
+    table th:nth-child(4),
+    table td:nth-child(4) {
+        display: none;
+    }
+}
+</style>
+
 
     {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
