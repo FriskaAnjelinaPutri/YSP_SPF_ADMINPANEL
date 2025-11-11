@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class TipeController extends Controller
 {
@@ -24,17 +24,18 @@ class TipeController extends Controller
      */
     public function index()
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/tipe');
+                ->get($this->apiBase().'/tipe');
 
             if ($response->failed()) {
                 Log::error('Gagal mengambil data tipe', ['body' => $response->body()]);
+
                 return view('tipe.index', [
                     'tipes' => [],
                     'error' => 'Gagal mengambil data tipe dari API',
@@ -47,6 +48,7 @@ class TipeController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error saat mengambil data tipe', ['error' => $e->getMessage()]);
+
             return view('tipe.index', [
                 'tipes' => [],
                 'error' => 'Terjadi kesalahan saat mengambil data',
@@ -67,7 +69,7 @@ class TipeController extends Controller
      */
     public function store(Request $request)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -83,7 +85,7 @@ class TipeController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->post($this->apiBase() . '/tipe', [
+                ->post($this->apiBase().'/tipe', [
                     'tipe_nama' => $request->tipe_nama,
                     'tipe_aktif' => $request->tipe_aktif,
                 ]);
@@ -91,15 +93,18 @@ class TipeController extends Controller
             if ($response->successful()) {
                 $data = $response->json()['data'] ?? null;
                 $kode = $data['tipe_kode'] ?? '';
+
                 return redirect()->route('tipe.index')
-                    ->with('success', 'Data tipe berhasil ditambahkan dengan kode: ' . $kode);
+                    ->with('success', 'Data tipe berhasil ditambahkan dengan kode: '.$kode);
             }
 
             $error = $response->json()['message'] ?? 'Gagal menyimpan data tipe';
+
             return back()->withInput()->with('error', $error);
 
         } catch (\Exception $e) {
             Log::error('Error saat menyimpan tipe', ['error' => $e->getMessage()]);
+
             return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data');
         }
     }
@@ -109,17 +114,18 @@ class TipeController extends Controller
      */
     public function show(string $kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/tipe/' . $kode);
+                ->get($this->apiBase().'/tipe/'.$kode);
 
             if ($response->successful()) {
                 $tipe = $response->json()['data'] ?? null;
+
                 return view('tipe.show', compact('tipe'));
             }
 
@@ -128,6 +134,7 @@ class TipeController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error saat mengambil detail tipe', ['error' => $e->getMessage()]);
+
             return redirect()->route('tipe.index')
                 ->with('error', 'Terjadi kesalahan saat mengambil data');
         }
@@ -138,17 +145,18 @@ class TipeController extends Controller
      */
     public function edit(string $kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/tipe/' . $kode);
+                ->get($this->apiBase().'/tipe/'.$kode);
 
             if ($response->successful()) {
                 $tipe = $response->json()['data'] ?? null;
+
                 return view('tipe.edit', compact('tipe'));
             }
 
@@ -157,6 +165,7 @@ class TipeController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error saat mengambil data tipe untuk edit', ['error' => $e->getMessage()]);
+
             return redirect()->route('tipe.index')
                 ->with('error', 'Terjadi kesalahan saat mengambil data');
         }
@@ -167,7 +176,7 @@ class TipeController extends Controller
      */
     public function update(Request $request, string $kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -183,7 +192,7 @@ class TipeController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->put($this->apiBase() . '/tipe/' . $kode, [
+                ->put($this->apiBase().'/tipe/'.$kode, [
                     'tipe_nama' => $request->tipe_nama,
                     'tipe_aktif' => $request->tipe_aktif,
                 ]);
@@ -194,10 +203,12 @@ class TipeController extends Controller
             }
 
             $error = $response->json()['message'] ?? 'Gagal memperbarui data tipe';
+
             return back()->withInput()->with('error', $error);
 
         } catch (\Exception $e) {
             Log::error('Error saat update tipe', ['error' => $e->getMessage()]);
+
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data');
         }
     }
@@ -207,14 +218,14 @@ class TipeController extends Controller
      */
     public function destroy(string $kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->delete($this->apiBase() . '/tipe/' . $kode);
+                ->delete($this->apiBase().'/tipe/'.$kode);
 
             if ($response->successful()) {
                 return redirect()->route('tipe.index')
@@ -222,10 +233,12 @@ class TipeController extends Controller
             }
 
             $error = $response->json()['message'] ?? 'Gagal menghapus data tipe';
+
             return back()->with('error', $error);
 
         } catch (\Exception $e) {
             Log::error('Error saat menghapus tipe', ['error' => $e->getMessage()]);
+
             return back()->with('error', 'Terjadi kesalahan saat menghapus data');
         }
     }

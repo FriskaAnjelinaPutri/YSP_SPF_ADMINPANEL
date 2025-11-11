@@ -8,7 +8,8 @@ class AdminDashboardController extends Controller
 {
     private $apiBase = 'http://127.0.0.1:8000/api';
 
-    private function token() {
+    private function token()
+    {
         return session('api_token');
     }
 
@@ -16,6 +17,7 @@ class AdminDashboardController extends Controller
     {
         $res = Http::withToken($this->token())->get($this->apiBase.'/dashboard')->json();
         $data = $res['data'] ?? [];
+
         return view('dashboard', compact('data'));
     }
 }

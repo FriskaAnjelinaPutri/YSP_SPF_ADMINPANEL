@@ -1,20 +1,15 @@
 <?php
 
-use App\Http\Middleware\AdminAuth;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\CutiController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\LemburController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PolaController;
 use App\Http\Controllers\TipeController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\JadwalController;
-use App\Http\Controllers\LemburController;
-use App\Http\Controllers\AbsensiController;
-use App\Http\Controllers\KaryawanController;
-use App\Http\Controllers\AdminAuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\AdminKaryawanController;
-use App\Http\Controllers\AdminDashboardController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.process');
@@ -74,6 +69,11 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/jadwal/{id}/edit', [JadwalController::class, 'edit'])->name('jadwal.edit');
     Route::put('/jadwal/{id}', [JadwalController::class, 'update'])->name('jadwal.update');
     Route::delete('/jadwal/{id}', [JadwalController::class, 'destroy'])->name('jadwal.destroy');
+
+    // Generate Jadwal
+    Route::get('/jadwal/generate', [JadwalController::class, 'generate'])->name('jadwal.generate.create');
+    Route::post('/jadwal/generate', [JadwalController::class, 'generateStore'])->name('jadwal.generate.store');
+    Route::get('/jadwal/hasil', [JadwalController::class, 'hasilGenerate'])->name('jadwal.hasil');
 
     // Manajemen Pola
     Route::get('/pola', [PolaController::class, 'index'])->name('pola.index');

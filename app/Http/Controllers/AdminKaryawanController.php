@@ -10,7 +10,8 @@ class AdminKaryawanController extends Controller
 {
     private $apiBase = 'http://127.0.0.1:8000/api';
 
-    private function token() {
+    private function token()
+    {
         return session('api_token');
     }
 
@@ -34,6 +35,7 @@ class AdminKaryawanController extends Controller
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
+
             return view('karyawan.index', [
                 'karyawans' => [],
                 'error' => 'Gagal mengambil data karyawan dari API.',
@@ -54,6 +56,7 @@ class AdminKaryawanController extends Controller
     public function store(Request $request)
     {
         $res = Http::withToken($this->token())->post($this->apiBase.'/karyawan', $request->all())->json();
+
         return redirect('/karyawan')->with('message', $res['message'] ?? 'Data berhasil dibuat');
     }
 
@@ -61,18 +64,21 @@ class AdminKaryawanController extends Controller
     {
         $res = Http::withToken($this->token())->get($this->apiBase."/karyawan/{$kar_kode}")->json();
         $karyawan = $res['data'] ?? [];
+
         return view('karyawan.edit', compact('karyawan'));
     }
 
     public function update(Request $request, $kar_kode)
     {
         $res = Http::withToken($this->token())->put($this->apiBase."/karyawan/{$kar_kode}", $request->all())->json();
+
         return redirect('/karyawan')->with('message', $res['message'] ?? 'Data berhasil diupdate');
     }
 
     public function destroy($kar_kode)
     {
         $res = Http::withToken($this->token())->delete($this->apiBase."/karyawan/{$kar_kode}")->json();
+
         return redirect('/karyawan')->with('message', $res['message'] ?? 'Data berhasil dihapus');
     }
 }

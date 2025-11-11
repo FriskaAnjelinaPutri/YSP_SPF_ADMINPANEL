@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class CutiController extends Controller
 {
@@ -25,7 +25,7 @@ class CutiController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -34,7 +34,7 @@ class CutiController extends Controller
             $status = $request->get('status');
             $kar_kode = $request->get('kar_kode');
 
-            $url = $this->apiBase() . '/cuti';
+            $url = $this->apiBase().'/cuti';
             $params = ['periode' => $periode];
 
             if ($status) {
@@ -50,6 +50,7 @@ class CutiController extends Controller
 
             if ($response->failed()) {
                 Log::error('Gagal mengambil data cuti', ['body' => $response->body()]);
+
                 return view('cuti.index', [
                     'cutis' => [],
                     'periode' => $periode,
@@ -64,7 +65,7 @@ class CutiController extends Controller
             // Get list karyawan untuk filter
             $karyawanResponse = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/karyawan');
+                ->get($this->apiBase().'/karyawan');
 
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
@@ -73,6 +74,7 @@ class CutiController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error saat mengambil data cuti', ['error' => $e->getMessage()]);
+
             return view('cuti.index', [
                 'cutis' => [],
                 'periode' => Carbon::now()->format('Y-m'),
@@ -80,19 +82,20 @@ class CutiController extends Controller
             ]);
         }
     }
+
     /**
      * Show the form for editing the specified cuti
      */
     public function edit($id)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/cuti/' . $id);
+                ->get($this->apiBase().'/cuti/'.$id);
 
             if ($response->failed()) {
                 return redirect()->route('cuti.index')
@@ -104,7 +107,7 @@ class CutiController extends Controller
             // Get list karyawan
             $karyawanResponse = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/karyawan');
+                ->get($this->apiBase().'/karyawan');
 
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
@@ -113,6 +116,7 @@ class CutiController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error saat mengambil data cuti untuk edit', ['error' => $e->getMessage()]);
+
             return redirect()->route('cuti.index')
                 ->with('error', 'Terjadi kesalahan saat mengambil data');
         }
@@ -123,7 +127,7 @@ class CutiController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -132,13 +136,13 @@ class CutiController extends Controller
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'jenis_cuti' => 'required|in:Tahunan,Sakit,Melahirkan,Menikah,Keluarga Meninggal,Lainnya',
             'alasan' => 'required|string|max:500',
-            'keterangan' => 'nullable|string|max:500'
+            'keterangan' => 'nullable|string|max:500',
         ]);
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->put($this->apiBase() . '/cuti/' . $id, [
+                ->put($this->apiBase().'/cuti/'.$id, [
                     'tanggal_mulai' => $request->tanggal_mulai,
                     'tanggal_selesai' => $request->tanggal_selesai,
                     'jenis_cuti' => $request->jenis_cuti,
@@ -152,10 +156,12 @@ class CutiController extends Controller
             }
 
             $error = $response->json()['message'] ?? 'Gagal memperbarui data cuti';
+
             return back()->withInput()->with('error', $error);
 
         } catch (\Exception $e) {
             Log::error('Error saat update cuti', ['error' => $e->getMessage()]);
+
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data');
         }
     }
@@ -165,14 +171,14 @@ class CutiController extends Controller
      */
     public function destroy($id)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->delete($this->apiBase() . '/cuti/' . $id);
+                ->delete($this->apiBase().'/cuti/'.$id);
 
             if ($response->successful()) {
                 return redirect()->route('cuti.index')
@@ -180,10 +186,12 @@ class CutiController extends Controller
             }
 
             $error = $response->json()['message'] ?? 'Gagal menghapus data cuti';
+
             return back()->with('error', $error);
 
         } catch (\Exception $e) {
             Log::error('Error saat menghapus cuti', ['error' => $e->getMessage()]);
+
             return back()->with('error', 'Terjadi kesalahan saat menghapus data');
         }
     }
@@ -193,16 +201,16 @@ class CutiController extends Controller
      */
     public function approve($id)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->post($this->apiBase() . '/cuti/approve', [
+                ->post($this->apiBase().'/cuti/approve', [
                     'id' => $id,
-                    'status' => 'Approved'
+                    'status' => 'Approved',
                 ]);
 
             if ($response->successful()) {
@@ -211,10 +219,12 @@ class CutiController extends Controller
             }
 
             $error = $response->json()['message'] ?? 'Gagal menyetujui cuti';
+
             return back()->with('error', $error);
 
         } catch (\Exception $e) {
             Log::error('Error saat approve cuti', ['error' => $e->getMessage()]);
+
             return back()->with('error', 'Terjadi kesalahan saat memproses approval');
         }
     }
@@ -224,17 +234,17 @@ class CutiController extends Controller
      */
     public function reject(Request $request, $id)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->post($this->apiBase() . '/cuti/approve', [
+                ->post($this->apiBase().'/cuti/approve', [
                     'id' => $id,
                     'status' => 'Rejected',
-                    'keterangan' => $request->keterangan
+                    'keterangan' => $request->keterangan,
                 ]);
 
             if ($response->successful()) {
@@ -243,10 +253,12 @@ class CutiController extends Controller
             }
 
             $error = $response->json()['message'] ?? 'Gagal menolak cuti';
+
             return back()->with('error', $error);
 
         } catch (\Exception $e) {
             Log::error('Error saat reject cuti', ['error' => $e->getMessage()]);
+
             return back()->with('error', 'Terjadi kesalahan saat memproses penolakan');
         }
     }

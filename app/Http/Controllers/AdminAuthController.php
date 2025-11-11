@@ -17,22 +17,23 @@ class AdminAuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'=>'required|email',
-            'password'=>'required|string'
+            'email' => 'required|email',
+            'password' => 'required|string',
         ]);
 
         $response = Http::post($this->apiBase.'/login', [
             'email' => $request->email,
-            'password' => $request->password
+            'password' => $request->password,
         ]);
 
         $res = $response->json();
 
-        if(isset($res['data']['access_token'])){
+        if (isset($res['data']['access_token'])) {
             session([
                 'api_token' => $res['data']['access_token'],
-                'user' => $res['data']['user']
+                'user' => $res['data']['user'],
             ]);
+
             return redirect('/');
         }
 
@@ -42,6 +43,7 @@ class AdminAuthController extends Controller
     public function logout(Request $request)
     {
         $request->session()->flush();
+
         return redirect('/login');
     }
 }

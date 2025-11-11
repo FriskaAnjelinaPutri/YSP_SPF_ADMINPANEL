@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class LemburController extends Controller
 {
@@ -25,7 +25,7 @@ class LemburController extends Controller
      *  ========================= */
     public function index(Request $request)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -43,8 +43,12 @@ class LemburController extends Controller
 
             // Ambil data lembur
             $params = ['periode' => $periode];
-            if ($status) $params['status'] = $status;
-            if ($karKode) $params['kar_kode'] = $karKode;
+            if ($status) {
+                $params['status'] = $status;
+            }
+            if ($karKode) {
+                $params['kar_kode'] = $karKode;
+            }
 
             $response = Http::withToken($this->token())
                 ->acceptJson()
@@ -57,11 +61,12 @@ class LemburController extends Controller
                     'karyawans' => $karyawans,
                     'periode' => $periode,
                     'status' => $status,
-                    'error' => 'Gagal mengambil data lembur dari API'
+                    'error' => 'Gagal mengambil data lembur dari API',
                 ]);
             }
 
             $data = $response->json();
+
             return view('lembur.index', [
                 'lemburs' => $data['data'] ?? [],
                 'summary' => $data['summary'] ?? [],
@@ -70,14 +75,15 @@ class LemburController extends Controller
                 'status' => $status,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error lembur index: ' . $e->getMessage());
+            Log::error('Error lembur index: '.$e->getMessage());
+
             return view('lembur.index', [
                 'lemburs' => [],
                 'summary' => [],
                 'karyawans' => [],
                 'periode' => $periode,
                 'status' => $status,
-                'error' => 'Terjadi kesalahan saat mengambil data'
+                'error' => 'Terjadi kesalahan saat mengambil data',
             ]);
         }
     }
@@ -87,7 +93,7 @@ class LemburController extends Controller
      *  ========================= */
     public function create()
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -97,9 +103,11 @@ class LemburController extends Controller
                 ->get("{$this->apiBase()}/karyawan");
 
             $karyawans = $res->successful() ? ($res->json()['data'] ?? []) : [];
+
             return view('lembur.create', compact('karyawans'));
         } catch (\Exception $e) {
-            Log::error('Error create lembur: ' . $e->getMessage());
+            Log::error('Error create lembur: '.$e->getMessage());
+
             return redirect()->route('lembur.index')->with('error', 'Gagal memuat form lembur.');
         }
     }
@@ -109,7 +117,9 @@ class LemburController extends Controller
      *  ========================= */
     public function store(Request $request)
     {
-        if (!$this->token()) return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        if (! $this->token()) {
+            return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        }
 
         $validated = $request->validate([
             'tanggal' => 'required|date',
@@ -117,17 +127,17 @@ class LemburController extends Controller
             'jam_selesai' => 'required|date_format:H:i',
             'alasan' => 'required|string|max:500',
             'status' => 'required|in:Pending,Approved,Rejected',
-            'keterangan' => 'nullable|string|max:500'
+            'keterangan' => 'nullable|string|max:500',
         ]);
 
         try {
             $payload = [
                 'tanggal' => $validated['tanggal'],
-                'jam_mulai' => $validated['jam_mulai'] . ':00',
-                'jam_selesai' => $validated['jam_selesai'] . ':00',
+                'jam_mulai' => $validated['jam_mulai'].':00',
+                'jam_selesai' => $validated['jam_selesai'].':00',
                 'alasan' => $validated['alasan'],
                 'status' => $validated['status'],
-                'keterangan' => $validated['keterangan'] ?? null
+                'keterangan' => $validated['keterangan'] ?? null,
             ];
 
             $response = Http::withToken($this->token())
@@ -139,9 +149,11 @@ class LemburController extends Controller
             }
 
             $msg = $response->json()['message'] ?? 'Gagal menyimpan data.';
+
             return back()->withInput()->with('error', $msg);
         } catch (\Exception $e) {
-            Log::error('Error store lembur: ' . $e->getMessage());
+            Log::error('Error store lembur: '.$e->getMessage());
+
             return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data.');
         }
     }
@@ -151,7 +163,9 @@ class LemburController extends Controller
      *  ========================= */
     public function edit($id)
     {
-        if (!$this->token()) return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        if (! $this->token()) {
+            return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        }
 
         try {
             $lemburRes = Http::withToken($this->token())
@@ -163,7 +177,9 @@ class LemburController extends Controller
             }
 
             $lembur = $lemburRes->json()['data']['lembur'] ?? null;
-            if (!$lembur) return redirect()->route('lembur.index')->with('error', 'Data lembur kosong.');
+            if (! $lembur) {
+                return redirect()->route('lembur.index')->with('error', 'Data lembur kosong.');
+            }
 
             $karyawanRes = Http::withToken($this->token())
                 ->acceptJson()
@@ -173,7 +189,8 @@ class LemburController extends Controller
 
             return view('lembur.edit', compact('lembur', 'karyawans'));
         } catch (\Exception $e) {
-            Log::error('Error edit lembur: ' . $e->getMessage());
+            Log::error('Error edit lembur: '.$e->getMessage());
+
             return redirect()->route('lembur.index')->with('error', 'Terjadi kesalahan.');
         }
     }
@@ -183,7 +200,9 @@ class LemburController extends Controller
      *  ========================= */
     public function update(Request $request, $id)
     {
-        if (!$this->token()) return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        if (! $this->token()) {
+            return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        }
 
         $validated = $request->validate([
             'tanggal' => 'required|date',
@@ -191,17 +210,17 @@ class LemburController extends Controller
             'jam_selesai' => 'required|date_format:H:i',
             'alasan' => 'required|string|max:500',
             'status' => 'required|in:Pending,Approved,Rejected',
-            'keterangan' => 'nullable|string|max:500'
+            'keterangan' => 'nullable|string|max:500',
         ]);
 
         try {
             $payload = [
                 'tanggal' => $validated['tanggal'],
-                'jam_mulai' => $validated['jam_mulai'] . ':00',
-                'jam_selesai' => $validated['jam_selesai'] . ':00',
+                'jam_mulai' => $validated['jam_mulai'].':00',
+                'jam_selesai' => $validated['jam_selesai'].':00',
                 'alasan' => $validated['alasan'],
                 'status' => $validated['status'],
-                'keterangan' => $validated['keterangan'] ?? null
+                'keterangan' => $validated['keterangan'] ?? null,
             ];
 
             $response = Http::withToken($this->token())
@@ -213,9 +232,11 @@ class LemburController extends Controller
             }
 
             $msg = $response->json()['message'] ?? 'Gagal memperbarui data.';
+
             return back()->withInput()->with('error', $msg);
         } catch (\Exception $e) {
-            Log::error('Error update lembur: ' . $e->getMessage());
+            Log::error('Error update lembur: '.$e->getMessage());
+
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui data.');
         }
     }
@@ -225,7 +246,9 @@ class LemburController extends Controller
      *  ========================= */
     public function destroy($id)
     {
-        if (!$this->token()) return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        if (! $this->token()) {
+            return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        }
 
         try {
             $res = Http::withToken($this->token())
@@ -237,9 +260,11 @@ class LemburController extends Controller
             }
 
             $msg = $res->json()['message'] ?? 'Gagal menghapus data.';
+
             return back()->with('error', $msg);
         } catch (\Exception $e) {
-            Log::error('Error delete lembur: ' . $e->getMessage());
+            Log::error('Error delete lembur: '.$e->getMessage());
+
             return back()->with('error', 'Terjadi kesalahan saat menghapus data.');
         }
     }
@@ -259,11 +284,15 @@ class LemburController extends Controller
 
     private function processApproval($id, $status, $keterangan = null)
     {
-        if (!$this->token()) return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        if (! $this->token()) {
+            return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        }
 
         try {
             $payload = ['id' => $id, 'status' => $status];
-            if ($keterangan) $payload['keterangan'] = $keterangan;
+            if ($keterangan) {
+                $payload['keterangan'] = $keterangan;
+            }
 
             $res = Http::withToken($this->token())
                 ->acceptJson()
@@ -271,13 +300,16 @@ class LemburController extends Controller
 
             if ($res->successful()) {
                 $msg = $status === 'Approved' ? 'Lembur berhasil disetujui.' : 'Lembur berhasil ditolak.';
+
                 return redirect()->route('lembur.index')->with('success', $msg);
             }
 
             $msg = $res->json()['message'] ?? 'Gagal memproses permintaan.';
+
             return back()->with('error', $msg);
         } catch (\Exception $e) {
-            Log::error("Error {$status} lembur: " . $e->getMessage());
+            Log::error("Error {$status} lembur: ".$e->getMessage());
+
             return back()->with('error', 'Terjadi kesalahan saat memproses.');
         }
     }

@@ -328,6 +328,34 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('jadwal.index') }}"
+                            class="nav-link {{ request()->routeIs('jadwal.*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar-check-fill"></i>
+                            <span>Jadwal</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('jadwal.generate.create') }}"
+                            class="nav-link {{ request()->routeIs('jadwal.generate.create') ? 'active' : '' }}" style="font-size: 0.85rem; margin-left: 20px;">
+                            <i class="bi bi-plus-circle-fill"></i>
+                            <span>Generate Jadwal</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('pola.index') }}"
+                            class="nav-link {{ request()->routeIs('pola.*') ? 'active' : '' }}">
+                            <i class="bi bi-diagram-3-fill"></i>
+                            <span>Pola</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('tipe.index') }}"
+                            class="nav-link {{ request()->routeIs('tipe.*') ? 'active' : '' }}">
+                            <i class="bi bi-tags-fill"></i>
+                            <span>Tipe</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="bi bi-headset"></i>
                             <span>Helpdesk</span>

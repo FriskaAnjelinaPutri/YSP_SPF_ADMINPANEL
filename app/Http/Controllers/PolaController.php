@@ -20,16 +20,17 @@ class PolaController extends Controller
      */
     public function index()
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         $response = Http::withToken($this->token())
             ->acceptJson()
-            ->get($this->apiBase . '/pola');
+            ->get($this->apiBase.'/pola');
 
         if ($response->failed()) {
             Log::error('Gagal mengambil data pola', ['body' => $response->body()]);
+
             return view('pola.index', [
                 'polas' => [],
                 'error' => 'Gagal mengambil data pola dari API',
@@ -43,7 +44,7 @@ class PolaController extends Controller
             if (isset($pola['jadwal_kode'])) {
                 $jadwalResponse = Http::withToken($this->token())
                     ->acceptJson()
-                    ->get($this->apiBase . '/jadwal/' . $pola['jadwal_kode']);
+                    ->get($this->apiBase.'/jadwal/'.$pola['jadwal_kode']);
 
                 if ($jadwalResponse->successful()) {
                     $pola['jadwal'] = $jadwalResponse->json()['data'] ?? null;
@@ -53,13 +54,14 @@ class PolaController extends Controller
 
         return view('pola.index', compact('polas'));
     }
+
     /**
      * Tampilkan form tambah pola
      */
     public function create()
     {
         // pastikan session token ada
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -70,7 +72,7 @@ class PolaController extends Controller
             $respTipe = Http::withToken($this->token())
                 ->acceptJson()
                 ->timeout(10)
-                ->get($this->apiBase . '/tipe');
+                ->get($this->apiBase.'/tipe');
 
             if ($respTipe->successful()) {
                 $tipes = $respTipe->json('data', []);
@@ -78,14 +80,14 @@ class PolaController extends Controller
                 Log::warning('Gagal ambil tipe dari API', ['status' => $respTipe->status(), 'body' => $respTipe->body()]);
             }
         } catch (\Exception $e) {
-            Log::error('Exception saat ambil tipe: ' . $e->getMessage());
+            Log::error('Exception saat ambil tipe: '.$e->getMessage());
         }
 
         try {
             $respJadwal = Http::withToken($this->token())
                 ->acceptJson()
                 ->timeout(10)
-                ->get($this->apiBase . '/jadwal');
+                ->get($this->apiBase.'/jadwal');
 
             if ($respJadwal->successful()) {
                 $jadwals = $respJadwal->json('data', []);
@@ -93,7 +95,7 @@ class PolaController extends Controller
                 Log::warning('Gagal ambil jadwal dari API', ['status' => $respJadwal->status(), 'body' => $respJadwal->body()]);
             }
         } catch (\Exception $e) {
-            Log::error('Exception saat ambil jadwal: ' . $e->getMessage());
+            Log::error('Exception saat ambil jadwal: '.$e->getMessage());
         }
 
         // kirim ke view, pastikan selalu ada variabel meskipun kosong
@@ -110,7 +112,7 @@ class PolaController extends Controller
     {
         Log::info('Form Pola diterima:', $request->all());
 
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -122,7 +124,7 @@ class PolaController extends Controller
 
         $response = Http::withToken($this->token())
             ->acceptJson()
-            ->post($this->apiBase . '/pola', $payload);
+            ->post($this->apiBase.'/pola', $payload);
 
         Log::info('API Pola Store Response:', [
             'status' => $response->status(),
@@ -131,6 +133,7 @@ class PolaController extends Controller
 
         if ($response->failed()) {
             $error = $response->json()['message'] ?? 'Gagal menambah pola';
+
             return back()->withInput()->with('error', $error);
         }
 
@@ -142,20 +145,20 @@ class PolaController extends Controller
      */
     public function edit($kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
-        
+
         $pola = Http::withToken($this->token())
             ->acceptJson()
-            ->get($this->apiBase . '/pola/' . $kode);
+            ->get($this->apiBase.'/pola/'.$kode);
 
         $tipe = Http::withToken($this->token())
             ->acceptJson()
-            ->get($this->apiBase . '/tipe');
+            ->get($this->apiBase.'/tipe');
         $jadwal = Http::withToken($this->token())
             ->acceptJson()
-            ->get($this->apiBase . '/jadwal');
+            ->get($this->apiBase.'/jadwal');
 
         if ($pola->failed()) {
             return redirect()->route('pola.index')->with('error', 'Data pola tidak ditemukan.');
@@ -173,7 +176,7 @@ class PolaController extends Controller
      */
     public function update(Request $request, $kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -185,7 +188,7 @@ class PolaController extends Controller
 
         $response = Http::withToken($this->token())
             ->acceptJson()
-            ->put($this->apiBase . '/pola/' . $kode, $payload);
+            ->put($this->apiBase.'/pola/'.$kode, $payload);
 
         Log::info('API Pola Update Response:', [
             'status' => $response->status(),
@@ -194,6 +197,7 @@ class PolaController extends Controller
 
         if ($response->failed()) {
             $error = $response->json()['message'] ?? 'Gagal update pola';
+
             return back()->withInput()->with('error', $error);
         }
 
@@ -205,16 +209,17 @@ class PolaController extends Controller
      */
     public function destroy($kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         $response = Http::withToken($this->token())
             ->acceptJson()
-            ->delete($this->apiBase . '/pola/' . $kode);
+            ->delete($this->apiBase.'/pola/'.$kode);
 
         if ($response->failed()) {
             $error = $response->json()['message'] ?? 'Gagal menghapus pola';
+
             return back()->with('error', $error);
         }
 

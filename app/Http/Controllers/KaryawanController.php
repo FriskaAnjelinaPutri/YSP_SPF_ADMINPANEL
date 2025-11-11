@@ -28,7 +28,7 @@ class KaryawanController extends Controller
      */
     public function index(Request $request)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -39,15 +39,16 @@ class KaryawanController extends Controller
             'page' => $page,
         ]);
 
-        $response = Http::withToken($this->token())->get($this->apiBase . '/karyawan', $params);
+        $response = Http::withToken($this->token())->get($this->apiBase.'/karyawan', $params);
 
         if ($response->failed()) {
             $status = $response->status();
             $errorMsg = $response->json()['message'] ?? "Gagal mengakses API. Status: {$status}";
-            Log::error('API Karyawan Index Error: ' . $errorMsg);
+            Log::error('API Karyawan Index Error: '.$errorMsg);
 
             if ($status === 401) {
                 session()->forget('api_token');
+
                 return redirect()->route('login')->with('error', 'Token tidak valid atau expired.');
             }
 
@@ -101,7 +102,7 @@ class KaryawanController extends Controller
             try {
                 $response = Http::withToken($this->token())
                     ->timeout(10)
-                    ->get($this->apiBase . $url);
+                    ->get($this->apiBase.$url);
 
                 if ($response->failed()) {
                     Log::error("API gagal ($key):", [
@@ -112,7 +113,7 @@ class KaryawanController extends Controller
 
                 $masters[$key] = $response->successful() ? $response->json()['data'] ?? [] : [];
             } catch (\Exception $e) {
-                Log::error("Exception $key: " . $e->getMessage());
+                Log::error("Exception $key: ".$e->getMessage());
                 $masters[$key] = [];
             }
         }
@@ -125,7 +126,7 @@ class KaryawanController extends Controller
      */
     public function create()
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -148,17 +149,18 @@ class KaryawanController extends Controller
      */
     public function store(Request $request)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         $payload = $request->only(['kar_kode', 'user_id', 'kar_nip', 'kar_nik', 'kar_nama', 'kar_email', 'kar_hp', 'tipe_kode', 'jabatan_kode', 'unit_kode', 'status_kode', 'golongan_kode', 'agama_kode', 'profesi_kode', 'kar_gelar_depan', 'kar_gelar_belakang', 'kar_lahir_tmp', 'kar_lahir_tgl', 'kar_jekel', 'kar_alamat', 'kar_email_perusahaan', 'kar_wa', 'kar_telegram', 'kar_norek', 'kar_nobpjs', 'kar_nojamsostek', 'kar_npwp']);
 
-        $response = Http::withToken($this->token())->post($this->apiBase . '/karyawan', $payload);
+        $response = Http::withToken($this->token())->post($this->apiBase.'/karyawan', $payload);
 
         if ($response->failed()) {
             $errorMsg = $response->json()['message'] ?? 'Gagal menambah karyawan';
-            Log::error('API Karyawan Store Error: ' . $errorMsg);
+            Log::error('API Karyawan Store Error: '.$errorMsg);
+
             return back()->withInput()->with('error', $errorMsg);
         }
 
@@ -170,15 +172,16 @@ class KaryawanController extends Controller
      */
     public function edit($kar_kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
-        $response = Http::withToken($this->token())->get($this->apiBase . '/karyawan/' . $kar_kode);
+        $response = Http::withToken($this->token())->get($this->apiBase.'/karyawan/'.$kar_kode);
 
         if ($response->failed()) {
             $errorMsg = $response->json()['message'] ?? 'Gagal mengambil data karyawan';
-            Log::error('API Karyawan Edit Error: ' . $errorMsg);
+            Log::error('API Karyawan Edit Error: '.$errorMsg);
+
             return redirect()->route('karyawan.index')->with('error', $errorMsg);
         }
 
@@ -193,7 +196,7 @@ class KaryawanController extends Controller
      */
     public function update(Request $request, $kar_kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -203,7 +206,7 @@ class KaryawanController extends Controller
 
         $response = Http::withToken($this->token())
             ->asForm()
-            ->post($this->apiBase . '/karyawan/' . $kar_kode, array_merge($payload, ['_method' => 'PUT']));
+            ->post($this->apiBase.'/karyawan/'.$kar_kode, array_merge($payload, ['_method' => 'PUT']));
 
         Log::info('Update Response:', [
             'status' => $response->status(),
@@ -212,7 +215,8 @@ class KaryawanController extends Controller
 
         if ($response->failed()) {
             $errorMsg = $response->json()['message'] ?? 'Gagal update karyawan';
-            Log::error('API Karyawan Update Error: ' . $errorMsg);
+            Log::error('API Karyawan Update Error: '.$errorMsg);
+
             return back()->withInput()->with('error', $errorMsg);
         }
 
@@ -224,15 +228,16 @@ class KaryawanController extends Controller
      */
     public function destroy($kar_kode)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
-        $response = Http::withToken($this->token())->delete($this->apiBase . '/karyawan/' . $kar_kode);
+        $response = Http::withToken($this->token())->delete($this->apiBase.'/karyawan/'.$kar_kode);
 
         if ($response->failed()) {
             $errorMsg = $response->json()['message'] ?? 'Gagal menghapus karyawan';
-            Log::error('API Karyawan Destroy Error: ' . $errorMsg);
+            Log::error('API Karyawan Destroy Error: '.$errorMsg);
+
             return back()->with('error', $errorMsg);
         }
 
