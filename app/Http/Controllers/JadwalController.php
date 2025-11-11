@@ -387,7 +387,7 @@ class JadwalController extends Controller
                 return back()->with('error', $error);
             }
 
-            return redirect()->route('jadwal.index')->with('success', 'Jadwal kerja berhasil di-generate.');
+            return redirect()->route('jadwal.hasil', ['bulan' => $bulan, 'tahun' => $tahun])->with('success', 'Jadwal kerja berhasil di-generate.');
 
         } catch (\Exception $e) {
             Log::error('Error saat generate jadwal', ['error' => $e->getMessage()]);

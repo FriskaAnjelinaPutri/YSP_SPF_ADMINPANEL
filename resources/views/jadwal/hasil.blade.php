@@ -1,109 +1,115 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-2xl font-bold mb-6">Hasil Generate Jadwal Kerja</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Hasil Generate Jadwal Kerja</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Hasil Jadwal Kerja</li>
+    </ol>
 
     @if (session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if (isset($error))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ $error }}</span>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-        <form action="{{ route('jadwal.hasil') }}" method="GET" class="flex flex-wrap items-end gap-4">
-            <div class="flex-grow">
-                <label for="bulan" class="block text-gray-700 text-sm font-bold mb-2">Bulan:</label>
-                <select name="bulan" id="bulan" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    @for ($i = 1; $i <= 12; $i++)
-                        <option value="{{ $i }}" {{ (int)$bulan === $i ? 'selected' : '' }}>
-                            {{ \Carbon\Carbon::create()->month($i)->locale('id')->monthName }}
-                        </option>
-                    @endfor
-                </select>
-            </div>
-            <div class="flex-grow">
-                <label for="tahun" class="block text-gray-700 text-sm font-bold mb-2">Tahun:</label>
-                <select name="tahun" id="tahun" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                    @for ($i = date('Y') - 5; $i <= date('Y') + 5; $i++)
-                        <option value="{{ $i }}" {{ (int)$tahun === $i ? 'selected' : '' }}>{{ $i }}</option>
-                    @endfor
-                </select>
-            </div>
-            <div>
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Filter
-                </button>
-            </div>
-        </form>
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <i class="bi bi-filter me-1"></i>
+            Filter Jadwal Kerja
+        </div>
+        <div class="card-body">
+            <form action="{{ route('jadwal.hasil') }}" method="GET">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="bulan" class="form-label">Bulan</label>
+                        <select name="bulan" id="bulan" class="form-select">
+                            @for ($i = 1; $i <= 12; $i++)
+                                <option value="{{ $i }}" {{ (int)$bulan === $i ? 'selected' : '' }}>
+                                    {{ \Carbon\Carbon::create()->month($i)->locale('id')->monthName }}
+                                </option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="tahun" class="form-label">Tahun</label>
+                        <select name="tahun" id="tahun" class="form-select">
+                            @for ($i = date('Y') - 5; $i <= date('Y') + 5; $i++)
+                                <option value="{{ $i }}" {{ (int)$tahun === $i ? 'selected' : '' }}>{{ $i }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search me-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    @if ($paginator && $paginator->total() > 0)
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full leading-normal">
-                    <thead>
-                        <tr>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Karyawan
-                            </th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Tanggal
-                            </th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Jadwal
-                            </th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Jam Mulai
-                            </th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Jam Selesai
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($paginator->items() as $jadwalKerja)
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <i class="bi bi-table me-1"></i>
+            Data Jadwal Kerja untuk {{ \Carbon\Carbon::create()->month($bulan)->locale('id')->monthName }} {{ $tahun }}
+        </div>
+        <div class="card-body">
+            @if ($paginator && $paginator->total() > 0)
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
                             <tr>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p class="text-gray-900 whitespace-no-wrap">{{ $jadwalKerja['karyawan_nama'] ?? 'N/A' }}</p>
-                                </td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p class="text-gray-900 whitespace-no-wrap">{{ \Carbon\Carbon::parse($jadwalKerja['tanggal'])->locale('id')->isoFormat('D MMMM YYYY') }}</p>
-                                </td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p class="text-gray-900 whitespace-no-wrap">{{ $jadwalKerja['jadwal_nama'] ?? 'N/A' }}</p>
-                                </td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p class="text-gray-900 whitespace-no-wrap">{{ $jadwalKerja['jam_mulai'] ?? 'N/A' }}</p>
-                                </td>
-                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p class="text-gray-900 whitespace-no-wrap">{{ $jadwalKerja['jam_selesai'] ?? 'N/A' }}</p>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Karyawan</th>
+                                <th scope="col">Tanggal</th>
+                                <th scope="col">Jadwal</th>
+                                <th scope="col">Jam Mulai</th>
+                                <th scope="col">Jam Selesai</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <div class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between">
-                {{ $paginator->appends(request()->except('page'))->links() }}
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach ($paginator as $index => $jadwalKerja)
+                                <tr>
+                                    <th scope="row">{{ $paginator->firstItem() + $index }}</th>
+                                    <td>{{ $jadwalKerja['kar_nama'] ?? 'N/A' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($jadwalKerja['tanggal'])->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">{{ $jadwalKerja['jadwal_nama'] ?? 'N/A' }}</span>
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($jadwalKerja['jam_mulai'])->format('H:i') ?? 'N/A' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($jadwalKerja['jam_selesai'])->format('H:i') ?? 'N/A' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end">
+                    {{ $paginator->appends(request()->except('page'))->links() }}
+                </div>
+            @else
+                <div class="text-center py-5">
+                    <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 3rem;"></i>
+                    <p class="mt-3">Tidak ada jadwal kerja yang ditemukan untuk bulan dan tahun ini.</p>
+                </div>
+            @endif
         </div>
-    @else
-        <div class="bg-white shadow-md rounded-lg p-6">
-            <p class="text-gray-600">Tidak ada jadwal kerja yang ditemukan untuk bulan dan tahun ini.</p>
-        </div>
-    @endif
+    </div>
 </div>
 @endsection

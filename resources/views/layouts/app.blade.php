@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semen Padang Hospital | Admin Panel</title>
+    <title>@yield('title', 'Semen Padang Hospital | Admin Panel')</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('logo sph.png') }}">
@@ -14,112 +14,171 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f0fdf4;
-            /* Light green background from dashboard */
             overflow-x: hidden;
         }
 
-        /* Sidebar */
+        /* ============ SIDEBAR ============ */
         .sidebar {
-            min-height: 100vh;
-            background-color: #ffffff;
-            color: #1f2937;
             position: fixed;
             top: 0;
             left: 0;
-            width: 260px;
-            /* A bit wider for better spacing */
+            height: 100vh;
+            width: 280px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             z-index: 1050;
             display: flex;
             flex-direction: column;
-            padding: 1.5rem;
         }
 
-        /* Collapsed state for future use if needed, for now, it's always open on desktop */
-        /* .sidebar.collapsed { width: 90px; } */
-
+        /* Sidebar Header */
         .sidebar-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding: 0 0.5rem;
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: center;
+            flex-shrink: 0;
         }
 
         .sidebar-header img {
-            height: 40px;
-            width: 40px;
-            margin-right: 0.75rem;
+            width: 50px;
+            height: 50px;
+            margin-bottom: 0.75rem;
         }
 
         .sidebar-header h5 {
             font-weight: 600;
             font-size: 1.1rem;
             color: #166534;
-            /* Dark green from dashboard */
-            line-height: 1.2;
-            margin-bottom: 0;
+            line-height: 1.3;
+            margin: 0;
         }
 
-        .sidebar-header h5 span {
+        .sidebar-header span {
             font-size: 0.8rem;
             color: #6b7280;
             font-weight: 400;
         }
 
+        /* Sidebar Navigation - Scrollable */
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem 0.75rem;
+        }
 
-        /* Sidebar Navigation */
+        /* Custom Scrollbar */
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Nav Items */
         .sidebar .nav-link {
             color: #374151;
-            /* Dark gray for text */
             border-radius: 0.5rem;
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
             font-weight: 500;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
 
         .sidebar .nav-link i {
-            font-size: 1.2rem;
-            margin-right: 1rem;
+            font-size: 1.1rem;
+            margin-right: 0.75rem;
             width: 20px;
             text-align: center;
             color: #6b7280;
             transition: all 0.2s ease;
         }
 
-        .sidebar .nav-link.active,
         .sidebar .nav-link:hover {
-            background-color: #dcfce7;
-            /* Light green from dashboard */
+            background-color: #f0fdf4;
             color: #166534;
-            /* Dark green from dashboard */
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #dcfce7;
+            color: #166534;
+            font-weight: 600;
         }
 
         .sidebar .nav-link.active i,
         .sidebar .nav-link:hover i {
             color: #16a34a;
-            /* Accent green from dashboard */
         }
 
-        /* Logout Button */
+        /* Submenu */
+        .submenu {
+            margin-left: 0;
+            padding-left: 2.5rem;
+        }
+
+        .submenu .nav-link {
+            font-size: 0.85rem;
+            padding: 0.6rem 1rem;
+        }
+
+        .submenu .nav-link i {
+            font-size: 0.9rem;
+        }
+
+        /* Collapse Arrow */
+        .collapse-arrow {
+            margin-left: auto;
+            font-size: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link[aria-expanded="true"] .collapse-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Sidebar Footer - Logout */
+        .sidebar-footer {
+            padding: 1rem 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
         .btn-logout {
             background-color: transparent;
-            border: 1px solid #d1d5db;
+            border: 1px solid #e5e7eb;
             color: #374151;
             border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
+            padding: 0.75rem;
             width: 100%;
             display: flex;
             align-items: center;
@@ -127,37 +186,31 @@
             gap: 0.75rem;
             transition: all 0.2s ease;
             font-weight: 500;
-            cursor: pointer;
-            margin-top: 1rem;
+            font-size: 0.9rem;
         }
 
         .btn-logout:hover {
-            background-color: #fca5a5;
-            /* Light red for hover */
-            color: #b91c1c;
-            /* Dark red for hover */
+            background-color: #fee2e2;
+            color: #dc2626;
             border-color: #fca5a5;
         }
 
         .btn-logout i {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
-        /* Main Content */
+        /* ============ MAIN CONTENT ============ */
         .content {
-            margin-left: 260px;
-            /* Match sidebar width */
-            width: calc(100% - 260px);
-            padding: 0;
-            transition: all 0.3s ease;
+            margin-left: 280px;
+            width: calc(100% - 280px);
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
 
         /* Topbar */
         .topbar {
             background: #ffffff;
-            padding: 1rem 2.5rem;
-            /* Match dashboard padding */
+            padding: 1rem 2rem;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
@@ -167,26 +220,72 @@
             z-index: 1000;
         }
 
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #166534;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-weight: 500;
             color: #374151;
         }
 
         .user-info i {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             color: #16a34a;
         }
 
-        /* Toggle Button (Mobile) */
-        .toggle-btn {
-            background: none;
-            border: none;
-            color: #166534;
-            font-size: 1.75rem;
-            cursor: pointer;
+        /* ============ COLLAPSED STATE ============ */
+        .sidebar.collapsed {
+            width: 80px;
         }
 
-        /* Overlay for Mobile */
+        .sidebar.collapsed .sidebar-header h5,
+        .sidebar.collapsed .sidebar-header span,
+        .sidebar.collapsed .nav-link span,
+        .sidebar.collapsed .btn-logout span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+            font-size: 1.3rem;
+        }
+
+        .sidebar.collapsed .submenu {
+            display: none;
+        }
+
+        .sidebar.collapsed .collapse-arrow {
+            display: none;
+        }
+
+        .content.collapsed {
+            margin-left: 80px;
+            width: calc(100% - 80px);
+            transition: height 0.3s ease;
+        }
+
+        .sidebar .collapse.show {
+            height: auto;
+        }
+
+        /* ============ MOBILE OVERLAY ============ */
         .overlay {
             display: none;
             position: fixed;
@@ -194,75 +293,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 1040;
+            transition: opacity 0.3s ease;
         }
 
         .overlay.active {
             display: block;
         }
 
-        /* Collapsed Sidebar Styles */
-        .sidebar.collapsed {
-            width: 90px;
-        }
-
-        .sidebar.collapsed .sidebar-header h5,
-        .sidebar.collapsed .nav-link span,
-        .sidebar.collapsed .btn-logout span {
-            display: none;
-        }
-
-        .sidebar.collapsed .sidebar-header {
-            justify-content: center;
-        }
-        
-        .sidebar.collapsed .sidebar-header img {
-            margin-right: 0;
-        }
-
-        .sidebar.collapsed .nav-link {
-            justify-content: center;
-        }
-
-        .sidebar.collapsed .nav-link i {
-            margin-right: 0;
-        }
-
-        .sidebar.collapsed .btn-logout {
-            justify-content: center;
-        }
-
-        .content.collapsed {
-            margin-left: 90px;
-            width: calc(100% - 90px);
-        }
-
-        /* Global Badge Styles for consistency */
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.4em 0.8em;
-            border-radius: 12px;
-            font-weight: 500;
-            text-transform: capitalize;
-            color: #fff; /* Ensure text is white for all custom badges */
-        }
-        .badge-success { background-color: #28a745; } /* Green */
-        .badge-warning { background-color: #ffc107; } /* Yellow/Orange */
-        .badge-primary { background-color: #007bff; } /* Blue */
-        .badge-info { background-color: #17a2b8; } /* Cyan */
-        .badge-danger { background-color: #dc3545; } /* Red */
-
+        /* ============ RESPONSIVE ============ */
         @media (max-width: 992px) {
             .sidebar {
                 left: -280px;
-                /* A bit wider for mobile */
-                width: 280px;
             }
 
             .sidebar.active {
                 left: 0;
-                box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
             }
 
             .content {
@@ -270,29 +318,70 @@
                 width: 100% !important;
             }
 
-            .topbar {
-                padding: 1rem 1.5rem;
+            .toggle-btn-desktop {
+                display: none !important;
             }
         }
+
+        @media (min-width: 993px) {
+            .toggle-btn-mobile {
+                display: none !important;
+            }
+        }
+
+        /* ============ BADGES ============ */
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.4em 0.8em;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: #22c55e;
+            color: #fff;
+        }
+
+        .badge-warning {
+            background-color: #f59e0b;
+            color: #fff;
+        }
+
+        .badge-danger {
+            background-color: #ef4444;
+            color: #fff;
+        }
+
+        .badge-info {
+            background-color: #3b82f6;
+            color: #fff;
+        }
+
+        .badge-primary {
+            background-color: #8b5cf6;
+            color: #fff;
+        }
     </style>
+
+    @yield('styles')
 </head>
 
 <body>
     <div class="d-flex">
-
-        <!-- Sidebar -->
+        <!-- ============ SIDEBAR ============ -->
         <nav class="sidebar" id="sidebar">
-            <div>
-                <div class="sidebar-header text-center">
-                    <img src="{{ asset('logo sph.png') }}" alt="Logo" style="width: 50px; margin-bottom: 10px;">
-                    <h5 style="font-weight: 600; font-size: 18px; line-height: 1.3;">
-                        Semen Padang Hospital
-                        <br>
-                        <span style="font-size: 13px; font-weight: 500; color: #595a5a;">Admin Panel</span>
-                    </h5>
-                </div>
+            <!-- Header -->
+            <div class="sidebar-header">
+                <img src="{{ asset('logo sph.png') }}" alt="Logo">
+                <h5>
+                    Semen Padang Hospital
+                    <br>
+                    <span>Admin Panel</span>
+                </h5>
+            </div>
 
-
+            <!-- Navigation -->
+            <div class="sidebar-nav">
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a href="{{ route('dashboard') }}"
@@ -301,71 +390,104 @@
                             <span>Dashboard</span>
                         </a>
                     </li>
+
                     <li class="nav-item">
                         <a href="{{ route('karyawan.index') }}"
                             class="nav-link {{ request()->routeIs('karyawan.*') ? 'active' : '' }}">
                             <i class="bi bi-people-fill"></i>
-                            <span>Employees</span>
+                            <span>Karyawan</span>
                         </a>
                     </li>
+
                     <li class="nav-item">
                         <a href="{{ route('absensi.index') }}"
                             class="nav-link {{ request()->routeIs('absensi.*') ? 'active' : '' }}">
                             <i class="bi bi-check-circle-fill"></i>
-                            <span>Attendance</span>
+                            <span>Absensi</span>
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a href="{{ route('lembur.index') }}" class="nav-link">
+                        <a href="{{ route('lembur.index') }}"
+                            class="nav-link {{ request()->routeIs('lembur.*') ? 'active' : '' }}">
                             <i class="bi bi-clock-fill"></i>
-                            <span>Overtime</span>
+                            <span>Lembur</span>
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a href="{{ route('cuti.index') }}" class="nav-link">
+                        <a href="{{ route('cuti.index') }}"
+                            class="nav-link {{ request()->routeIs('cuti.*') ? 'active' : '' }}">
                             <i class="bi bi-calendar-x-fill"></i>
-                            <span>Leave</span>
+                            <span>Cuti</span>
                         </a>
                     </li>
+
+                    <!-- Jadwal Submenu -->
                     <li class="nav-item">
-                        <a href="{{ route('jadwal.index') }}"
-                            class="nav-link {{ request()->routeIs('jadwal.*') ? 'active' : '' }}">
-                            <i class="bi bi-calendar-check-fill"></i>
-                            <span>Jadwal</span>
+                        <a class="nav-link d-flex align-items-center justify-content-between {{ request()->routeIs('jadwal.*') || request()->routeIs('pola.*') || request()->routeIs('tipe.*') ? 'active' : '' }}"
+                            href="#" role="button" id="jadwalDropdown">
+                            <div>
+                                <i class="bi bi-calendar-week-fill me-2"></i>
+                                <span>Manajemen Jadwal</span>
+                            </div>
+                            <i class="bi bi-chevron-down collapse-arrow ms-auto"></i>
                         </a>
+
+                        <div class="collapse {{ request()->routeIs('jadwal.*') || request()->routeIs('pola.*') || request()->routeIs('tipe.*') ? 'show' : '' }}"
+                            id="jadwalSubmenu">
+                            <ul class="submenu list-unstyled ps-3">
+                                <li>
+                                    <a href="{{ route('jadwal.index') }}"
+                                        class="nav-link {{ request()->routeIs('jadwal.index') ? 'active' : '' }}">
+                                        <i class="bi bi-clock"></i>
+                                        <span>Master Jadwal</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('pola.index') }}"
+                                        class="nav-link {{ request()->routeIs('pola.*') ? 'active' : '' }}">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                        <span>Pola Kerja</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('tipe.index') }}"
+                                        class="nav-link {{ request()->routeIs('tipe.*') ? 'active' : '' }}">
+                                        <i class="bi bi-tags"></i>
+                                        <span>Tipe Shift</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('jadwal.generate.create') }}"
+                                        class="nav-link {{ request()->routeIs('jadwal.generate.create') ? 'active' : '' }}">
+                                        <i class="bi bi-magic"></i>
+                                        <span>Generate Jadwal</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('jadwal.hasil') }}"
+                                        class="nav-link {{ request()->routeIs('jadwal.hasil') ? 'active' : '' }}">
+                                        <i class="bi bi-table"></i>
+                                        <span>Hasil Generate</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ route('jadwal.generate.create') }}"
-                            class="nav-link {{ request()->routeIs('jadwal.generate.create') ? 'active' : '' }}" style="font-size: 0.85rem; margin-left: 20px;">
-                            <i class="bi bi-plus-circle-fill"></i>
-                            <span>Generate Jadwal</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('pola.index') }}"
-                            class="nav-link {{ request()->routeIs('pola.*') ? 'active' : '' }}">
-                            <i class="bi bi-diagram-3-fill"></i>
-                            <span>Pola</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('tipe.index') }}"
-                            class="nav-link {{ request()->routeIs('tipe.*') ? 'active' : '' }}">
-                            <i class="bi bi-tags-fill"></i>
-                            <span>Tipe</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
+
+
+                    {{-- <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="bi bi-headset"></i>
                             <span>Helpdesk</span>
                         </a>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
 
-            <!-- Logout -->
-            <div class="mt-auto">
+            <!-- Footer - Logout -->
+            <div class="sidebar-footer">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="btn-logout">
@@ -376,29 +498,29 @@
             </div>
         </nav>
 
-        <!-- Overlay (mobile only) -->
+        <!-- Overlay (Mobile) -->
         <div class="overlay" id="overlay"></div>
 
-        <!-- Main Content -->
+        <!-- ============ MAIN CONTENT ============ -->
         <main class="content" id="content">
             <!-- Topbar -->
             <div class="topbar">
                 <div>
-                    <button class="toggle-btn d-lg-none" id="toggleSidebarMobile">
+                    <button class="toggle-btn toggle-btn-mobile" id="toggleSidebarMobile">
                         <i class="bi bi-list"></i>
                     </button>
-                    <button class="toggle-btn d-none d-lg-block" id="toggleSidebarDesktop">
+                    <button class="toggle-btn toggle-btn-desktop" id="toggleSidebarDesktop">
                         <i class="bi bi-list"></i>
                     </button>
                 </div>
-                <div class="d-flex align-items-center user-info">
-                    <i class="bi bi-person-circle me-2"></i>
+                <div class="user-info">
+                    <i class="bi bi-person-circle"></i>
                     <span>{{ session('user')['name'] ?? 'Admin' }}</span>
                 </div>
             </div>
 
             <!-- Page Content -->
-            <div class="mt-3 p-4">
+            <div class="p-4">
                 @yield('content')
             </div>
         </main>
@@ -408,52 +530,95 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('content');
             const overlay = document.getElementById('overlay');
             const toggleBtnMobile = document.getElementById('toggleSidebarMobile');
             const toggleBtnDesktop = document.getElementById('toggleSidebarDesktop');
 
-            // Function to toggle sidebar for desktop
-            const toggleDesktopSidebar = () => {
-                sidebar.classList.toggle('collapsed');
-                content.classList.toggle('collapsed');
-                // Save state to localStorage
-                if (sidebar.classList.contains('collapsed')) {
-                    localStorage.setItem('sidebarState', 'collapsed');
-                } else {
-                    localStorage.setItem('sidebarState', 'expanded');
+            // === DROPDOWN CUSTOM CONTROL ===
+            const dropdownTrigger = document.getElementById('jadwalDropdown');
+            const dropdownMenu = document.getElementById('jadwalSubmenu');
+            const arrow = dropdownTrigger.querySelector('.collapse-arrow');
+
+            dropdownTrigger.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const isOpen = dropdownMenu.classList.contains('show');
+
+                // Close all other dropdowns (if you add more later)
+                document.querySelectorAll('.sidebar .collapse').forEach(menu => {
+                    if (menu !== dropdownMenu) {
+                        menu.classList.remove('show');
+                        const siblingArrow = menu.previousElementSibling.querySelector(
+                            '.collapse-arrow');
+                        if (siblingArrow) siblingArrow.style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                // Toggle current
+                dropdownMenu.classList.toggle('show');
+                arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+            });
+
+            // Close dropdown when clicking outside (optional)
+            document.addEventListener('click', function(e) {
+                if (!sidebar.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                    arrow.style.transform = 'rotate(0deg)';
                 }
-            };
+            });
 
-            // Function to toggle sidebar for mobile
-            const toggleMobileSidebar = () => {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            };
-
-            // Check for saved sidebar state on page load
-            if (localStorage.getItem('sidebarState') === 'collapsed' && window.innerWidth > 992) {
+            // === SIDEBAR TOGGLE (Desktop & Mobile) ===
+            const savedState = localStorage.getItem('sidebarState');
+            if (window.innerWidth > 992 && savedState === 'collapsed') {
                 sidebar.classList.add('collapsed');
                 content.classList.add('collapsed');
             }
 
-            // Event Listeners
             if (toggleBtnDesktop) {
-                toggleBtnDesktop.addEventListener('click', toggleDesktopSidebar);
-            }
-            if (toggleBtnMobile) {
-                toggleBtnMobile.addEventListener('click', toggleMobileSidebar);
-            }
-            if (overlay) {
-                overlay.addEventListener('click', () => {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
+                toggleBtnDesktop.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    content.classList.toggle('collapsed');
+                    const state = sidebar.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+                    localStorage.setItem('sidebarState', state);
                 });
             }
+
+            if (toggleBtnMobile) {
+                toggleBtnMobile.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            // === Fix Bootstrap Collapse Conflict (Optional Backup) ===
+            const bsCollapses = document.querySelectorAll('.sidebar .collapse');
+            bsCollapses.forEach(collapse => {
+                collapse.addEventListener('show.bs.collapse', function() {
+                    bsCollapses.forEach(other => {
+                        if (other !== collapse && other.classList.contains('show')) {
+                            const bsCollapse = bootstrap.Collapse.getInstance(other);
+                            if (bsCollapse) bsCollapse.hide();
+                        }
+                    });
+                });
+            });
         });
     </script>
+
+
+    @yield('scripts')
 </body>
 
 </html>
