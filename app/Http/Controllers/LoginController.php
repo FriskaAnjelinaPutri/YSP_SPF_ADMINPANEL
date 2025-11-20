@@ -29,10 +29,27 @@ class LoginController extends Controller
         ]);
 
         try {
-            // Panggil API login
-            $response = Http::post(env('API_URL').'/login', [
+            $apiUrlBase = env('API_URL');
+            if (!$apiUrlBase) {
+                Log::critical('API_URL environment variable is not set in LoginController.');
+                return back()->withInput($request->only('email'))->with('error', 'Kesalahan konfigurasi server: API_URL tidak diatur.');
+            }
+
+            $apiUrl = $apiUrlBase.'/login';
+            $payload = [
                 'email' => $request->email,
                 'password' => $request->password,
+            ];
+
+            Log::info('Attempting to login to API.', ['url' => $apiUrl, 'payload' => $payload]);
+
+            // Panggil API login
+            $response = Http::post($apiUrl, $payload);
+
+            Log::info('Received response from API.', [
+                'status' => $response->status(),
+                'headers' => $response->headers(),
+                'body' => $response->body(),
             ]);
 
             // Cek jika request gagal (HTTP error)
