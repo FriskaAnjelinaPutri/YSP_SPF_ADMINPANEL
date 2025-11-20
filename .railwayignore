@@ -1,0 +1,4 @@
+tests/
+phpunit.xml
+pest.php
+.phpunit.result.cache
