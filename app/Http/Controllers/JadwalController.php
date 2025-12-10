@@ -356,6 +356,7 @@ class JadwalController extends Controller
 
             $response = Http::withToken($this->token())
                 ->acceptJson()
+                ->timeout(120) // Tambahkan timeout 120 detik
                 ->post($this->apiBase() . '/jadwal-kerja/generate', [
                     'jadwal_kerja' => $jadwalKerja,
                 ]);

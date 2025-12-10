@@ -135,6 +135,7 @@ class CutiController extends Controller
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'jenis_cuti' => 'required|in:Tahunan,Sakit,Melahirkan,Menikah,Keluarga Meninggal,Lainnya',
+            'status' => 'required|in:Pending,Approved,Rejected',
             'alasan' => 'required|string|max:500',
             'keterangan' => 'nullable|string|max:500',
         ]);
@@ -146,6 +147,7 @@ class CutiController extends Controller
                     'tanggal_mulai' => $request->tanggal_mulai,
                     'tanggal_selesai' => $request->tanggal_selesai,
                     'jenis_cuti' => $request->jenis_cuti,
+                    'status' => $request->status,
                     'alasan' => $request->alasan,
                     'keterangan' => $request->keterangan,
                 ]);
