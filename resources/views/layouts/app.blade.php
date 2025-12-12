@@ -251,6 +251,13 @@
                     </li>
 
                     <li class="nav-item">
+                        <a href="{{ route('user.index') }}" class="nav-link {{ request()->routeIs('user.*') ? 'active' : '' }}">
+                            <i class="bi bi-person-badge-fill"></i>
+                            <span>Pengguna</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
                         <a href="{{ route('absensi.index') }}" class="nav-link {{ request()->routeIs('absensi.*') ? 'active' : '' }}">
                             <i class="bi bi-check-circle-fill"></i>
                             <span>Absensi</span>
@@ -295,6 +302,12 @@
                                 <i class="bi bi-table"></i> Hasil Generate
                             </a>
                         </div>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('helpdesk.index') }}" class="nav-link {{ request()->routeIs('helpdesk.*') ? 'active' : '' }}">
+                            <i class="bi bi-calendar-x-fill"></i>
+                            <span>Helpdesk</span>
+                        </a>
                     </li>
                 </ul>
             </div>

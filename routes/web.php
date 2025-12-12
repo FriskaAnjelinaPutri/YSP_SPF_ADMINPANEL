@@ -9,7 +9,13 @@ use App\Http\Controllers\LemburController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PolaController;
 use App\Http\Controllers\TipeController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\HelpdeskController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('home');
+});
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.process');
@@ -61,6 +67,12 @@ Route::middleware(['admin'])->group(function () {
     Route::get('/karyawan/{id}/edit', [KaryawanController::class, 'edit'])->name('karyawan.edit');
     Route::put('/karyawan/{id}', [KaryawanController::class, 'update'])->name('karyawan.update');
     Route::delete('/karyawan/{id}', [KaryawanController::class, 'destroy'])->name('karyawan.destroy');
+
+    // User Management
+    Route::resource('user', AdminUserController::class)->except(['create', 'store', 'show']);
+
+    // Helpdesk Management
+    Route::resource('helpdesk', HelpdeskController::class)->except(['create', 'store', 'show']);
 
     // Manajemen Jadwal
     Route::get('/jadwal', [JadwalController::class, 'index'])->name('jadwal.index');

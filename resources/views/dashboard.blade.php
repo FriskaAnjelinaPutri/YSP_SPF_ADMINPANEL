@@ -202,7 +202,6 @@
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Position</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -218,9 +217,6 @@
                                     </div>
                                 </td>
                                 <td class="text-muted">{{ $karyawan['kar_email'] }}</td>
-                                <td>
-                                    <span class="badge-custom">{{ $karyawan['jabatan_kode'] ?? 'N/A' }}</span>
-                                </td>
                             </tr>
                         @empty
                             <tr>
