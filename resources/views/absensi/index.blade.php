@@ -162,11 +162,7 @@
             </h3>
             <small class="text-secondary">Manajemen data absensi karyawan</small>
         </div>
-        <div>
-            <a href="{{ route('absensi.export', ['periode' => $periode]) }}" class="btn btn-success shadow-sm btn-rounded me-2">
-                <i class="bi bi-file-earmark-excel-fill me-1"></i> Export Excel
-            </a>
-        </div>
+
     </div>
 
     {{-- Alerts --}}
@@ -198,7 +194,7 @@
             <div class="col">
                 <div class="summary-card">
                     <div class="icon {{ $item['color'] }}"><i class="bi {{ $item['icon'] }}"></i></div>
-                    <h5 class="mt-2 mb-0">{{ $summary[$status] ?? 0 }}</h5>
+                    <h5 class="mt-2 mb-0">{{ $summary['total_'.strtolower($status)] ?? 0 }}</h5>
                     <small class="text-muted">{{ $status }}</small>
                 </div>
             </div>
@@ -211,24 +207,22 @@
             <h5 class="mb-0 fw-semibold">
                 <i class="bi bi-list-ul me-2"></i>Daftar Absensi
             </h5>
-            <form method="GET" action="{{ route('absensi.index') }}" class="d-flex align-items-center">
-                <select name="kar_kode" class="form-select form-select-sm me-2" style="width: 200px;">
-                    <option value="">Semua Karyawan</option>
-                    @foreach($karyawans as $k)
-                        <option value="{{ $k['kar_kode'] }}" {{ ($kar_kode ?? '') == $k['kar_kode'] ? 'selected' : '' }}>
-                            {{ $k['kar_nama'] }}
-                        </option>
-                    @endforeach
-                </select>
-                <select name="status" class="form-select form-select-sm me-2" style="width: 150px;">
-                    <option value="">Semua Status</option>
-                    @foreach(['Hadir', 'Terlambat', 'Izin', 'Sakit', 'Alpha'] as $s)
-                        <option value="{{ $s }}" {{ ($status ?? '') == $s ? 'selected' : '' }}>{{ $s }}</option>
-                    @endforeach
-                </select>
-                <input type="month" name="periode" class="form-control form-control-sm me-2" value="{{ $periode }}">
-                <button type="submit" class="btn btn-light btn-sm"><i class="bi bi-filter"></i> Filter</button>
-            </form>
+            <div class="d-flex align-items-center">
+                <a href="{{ route('lokasi.show') }}" class="btn btn-info btn-sm btn-rounded me-3">
+                    <i class="bi bi-geo-alt-fill me-1"></i> Pengaturan Lokasi
+                </a>
+                <form method="GET" action="{{ route('absensi.index') }}" class="d-flex align-items-center">
+                    <input type="text" name="kar_nama" class="form-control form-control-sm me-2" style="width: 200px;" placeholder="Cari Nama Karyawan..." value="{{ $kar_nama ?? '' }}">
+                    <select name="status" class="form-select form-select-sm me-2" style="width: 150px;">
+                        <option value="">Semua Status</option>
+                        @foreach(['Hadir', 'Terlambat', 'Izin', 'Sakit', 'Alpha'] as $s)
+                            <option value="{{ $s }}" {{ ($status ?? '') == $s ? 'selected' : '' }}>{{ $s }}</option>
+                        @endforeach
+                    </select>
+                    <input type="month" name="periode" class="form-control form-control-sm me-2" value="{{ $periode }}">
+                    <button type="submit" class="btn btn-light btn-sm"><i class="bi bi-filter"></i> Filter</button>
+                </form>
+            </div>
         </div>
 
         <div class="card-body p-0">
@@ -293,13 +287,44 @@
                         @empty
                         <tr>
                             <td colspan="6" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox me-2 fs-5"></i>Belum ada data absensi untuk periode ini.
+                                <i class="bi bi-inbox me-2 fs-5"></i>Belum ada data absensi untuk filter ini.
                             </td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            {{-- Pagination --}}
+            @if ($meta && $meta['last_page'] > 1)
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <div class="text-secondary small">
+                    Menampilkan {{ $meta['from'] }} - {{ $meta['to'] }} dari {{ $meta['total'] }} data
+                </div>
+                <nav>
+                    <ul class="pagination mb-0">
+                        {{-- Previous Page Link --}}
+                        <li class="page-item {{ !$links['prev'] ? 'disabled' : '' }}">
+                            <a class="page-link" href="{{ $links['prev'] ? $links['prev'] . '&' . http_build_query(request()->except('page')) : '#' }}">«</a>
+                        </li>
+
+                        {{-- Pagination Elements --}}
+                        @foreach ($meta['links'] as $link)
+                            @if (is_numeric($link['label']))
+                                <li class="page-item {{ $link['active'] ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ $link['url'] . '&' . http_build_query(request()->except('page')) }}">{{ $link['label'] }}</a>
+                                </li>
+                            @endif
+                        @endforeach
+
+                        {{-- Next Page Link --}}
+                        <li class="page-item {{ !$links['next'] ? 'disabled' : '' }}">
+                            <a class="page-link" href="{{ $links['next'] ? $links['next'] . '&' . http_build_query(request()->except('page')) : '#' }}">»</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            @endif
         </div>
     </div>
 </div>

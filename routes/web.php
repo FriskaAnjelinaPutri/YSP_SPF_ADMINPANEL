@@ -11,6 +11,7 @@ use App\Http\Controllers\PolaController;
 use App\Http\Controllers\TipeController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\HelpdeskController;
+use App\Http\Controllers\LokasiController; // Add this line
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -72,7 +73,12 @@ Route::middleware(['admin'])->group(function () {
     Route::resource('user', AdminUserController::class)->except(['create', 'store', 'show']);
 
     // Helpdesk Management
-    Route::resource('helpdesk', HelpdeskController::class)->except(['create', 'store', 'show']);
+    Route::resource('helpdesk', HelpdeskController::class)->except(['create', 'store']);
+
+    // Manajemen Lokasi Kantor
+    Route::get('/lokasi', [LokasiController::class, 'show'])->name('lokasi.show');
+    Route::get('/lokasi/edit', [LokasiController::class, 'edit'])->name('lokasi.edit');
+    Route::put('/lokasi', [LokasiController::class, 'update'])->name('lokasi.update');
 
     // Manajemen Jadwal
     Route::get('/jadwal', [JadwalController::class, 'index'])->name('jadwal.index');

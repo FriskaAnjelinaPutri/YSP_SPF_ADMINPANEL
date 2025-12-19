@@ -4,98 +4,128 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class HelpdeskController extends Controller
 {
-    private function apiBase()
-    {
-        return env('API_URL', 'http://127.0.0.1:8000/api');
-    }
-
     private function token()
     {
-        return Session::get('api_token');
+        return session('api_token');
+    }
+
+    private function getApiUrl()
+    {
+        $apiUrlBase = env('API_URL');
+        if (!$apiUrlBase) {
+            throw new \Exception('API_URL environment variable is not set.');
+        }
+        return $apiUrlBase;
+    }
+
+    private function getStatusOptions()
+    {
+        return ['Open', 'In Progress', 'Resolved', 'Closed'];
     }
 
     public function index(Request $request)
     {
-        $search = $request->query('search');
-
         try {
-            $response = Http::withToken($this->token())
-                ->acceptJson()
-                ->get($this->apiBase() . '/helpdesk', [
-                    'search' => $search,
-                ]);
+            $apiUrlBase = $this->getApiUrl();
+            $periode = $request->input('periode', Carbon::now()->format('Y-m'));
+            $url = $apiUrlBase.'/helpdesk/'.$periode;
 
-            if ($response->successful()) {
-                $helpdesks = $response->json()['data'];
-                return view('helpdesk.index', compact('helpdesks', 'search'));
+            Log::info('Mengambil data helpdesk dari API', ['url' => $url]);
+            $response = Http::withToken($this->token())->get($url);
+
+            if ($response->failed()) {
+                Log::error('Gagal ambil data helpdesk', ['status' => $response->status(), 'body' => $response->body()]);
+                return view('helpdesk.index', ['helpdesks' => [], 'periode' => $periode, 'error' => 'Gagal mengambil data helpdesk dari API.']);
             }
 
-            return back()->with('error', 'Gagal mengambil data helpdesk dari API.');
+            $helpdesks = json_decode(json_encode($response->json()['data'] ?? []));
+            return view('helpdesk.index', compact('helpdesks', 'periode'));
+
         } catch (\Exception $e) {
-            Log::error('Error fetching helpdesk tickets: ' . $e->getMessage());
-            return back()->with('error', 'Tidak dapat terhubung ke server API.');
+            Log::critical('Could not connect to API for helpdesk index.', ['exception_message' => $e->getMessage()]);
+            return view('helpdesk.index', ['helpdesks' => [], 'periode' => $periode ?? Carbon::now()->format('Y-m'), 'error' => 'Could not connect to the API.']);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $apiUrlBase = $this->getApiUrl();
+            $response = Http::withToken($this->token())->get($apiUrlBase."/helpdesk/detail/{$id}");
+
+            if ($response->failed()) {
+                return response()->json(['error' => 'Tiket tidak ditemukan atau gagal mengambil data.'], 404);
+            }
+            return $response->json();
+
+        } catch (\Exception $e) {
+            Log::critical('Could not connect to API for helpdesk show.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+            return response()->json(['error' => 'Could not connect to the API.'], 500);
         }
     }
 
     public function edit($id)
     {
         try {
-            $response = Http::withToken($this->token())->get($this->apiBase() . '/helpdesk/' . $id);
+            $apiUrlBase = $this->getApiUrl();
+            $response = Http::withToken($this->token())->get($apiUrlBase."/helpdesk/detail/{$id}");
 
-            if ($response->successful()) {
-                $helpdesk = $response->json()['data'];
-                return view('helpdesk.edit', compact('helpdesk'));
+            if ($response->failed()) {
+                return redirect()->route('helpdesk.index')->with('error', 'Tiket tidak ditemukan.');
             }
 
-            return back()->with('error', 'Gagal mengambil data tiket helpdesk.');
+            $ticket = json_decode(json_encode($response->json()['data'] ?? []));
+            $statuses = $this->getStatusOptions();
+
+            return view('helpdesk.edit', compact('ticket', 'statuses'));
+
         } catch (\Exception $e) {
-            Log::error('Error fetching helpdesk ticket for edit: ' . $e->getMessage());
-            return back()->with('error', 'Tidak dapat terhubung ke server API.');
+            Log::critical('Could not connect to API for helpdesk edit.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+            return redirect()->route('helpdesk.index')->with('error', 'Could not connect to the API.');
         }
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'status' => 'required|string',
-            'prioritas' => 'required|string',
-            'kategori' => 'required|string',
-        ]);
-
         try {
-            $response = Http::withToken($this->token())->put($this->apiBase() . '/helpdesk/' . $id, $request->all());
+            $apiUrlBase = $this->getApiUrl();
+            $validated = $request->validate(['status' => 'required|string']);
 
-            if ($response->successful()) {
-                return redirect()->route('helpdesk.index')->with('success', 'Data tiket helpdesk berhasil diperbarui.');
+            $response = Http::withToken($this->token())->put($apiUrlBase."/helpdesk/status/{$id}", [
+                'status' => $validated['status']
+            ]);
+
+            if ($response->failed()) {
+                return back()->with('error', 'Gagal memperbarui status tiket.');
             }
 
-            return back()->with('error', 'Gagal memperbarui data tiket helpdesk: ' . $response->json('message', 'Unknown error'))->withInput();
+            return redirect()->route('helpdesk.index')->with('message', 'Status tiket berhasil diperbarui.');
+
         } catch (\Exception $e) {
-            Log::error('Error updating helpdesk ticket: ' . $e->getMessage());
-            return back()->with('error', 'Tidak dapat terhubung ke server API.')->withInput();
+            Log::critical('Could not connect to API for helpdesk update.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+            return back()->with('error', 'Could not connect to the API.');
         }
     }
 
     public function destroy($id)
     {
         try {
-            $response = Http::withToken($this->token())->delete($this->apiBase() . '/helpdesk/' . $id);
+            $apiUrlBase = $this->getApiUrl();
+            $response = Http::withToken($this->token())->delete($apiUrlBase."/helpdesk/{$id}");
 
-            if ($response->successful()) {
-                return redirect()->route('helpdesk.index')->with('success', 'Tiket helpdesk berhasil dihapus.');
+            if ($response->failed()) {
+                return redirect()->route('helpdesk.index')->with('error', 'Gagal menghapus tiket.');
             }
+            return redirect()->route('helpdesk.index')->with('message', 'Tiket berhasil dihapus.');
 
-            return back()->with('error', 'Gagal menghapus tiket helpdesk: ' . $response->json('message', 'Unknown error'));
         } catch (\Exception $e) {
-            Log::error('Error deleting helpdesk ticket: ' . $e->getMessage());
-            return back()->with('error', 'Tidak dapat terhubung ke server API.');
+            Log::critical('Could not connect to API for helpdesk destroy.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+            return redirect()->route('helpdesk.index')->with('error', 'Could not connect to the API.');
         }
     }
 }

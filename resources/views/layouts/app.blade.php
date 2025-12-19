@@ -305,7 +305,7 @@
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('helpdesk.index') }}" class="nav-link {{ request()->routeIs('helpdesk.*') ? 'active' : '' }}">
-                            <i class="bi bi-calendar-x-fill"></i>
+                            <i class="bi bi-headset"></i>
                             <span>Helpdesk</span>
                         </a>
                     </li>
