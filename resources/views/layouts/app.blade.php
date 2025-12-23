@@ -220,6 +220,28 @@
         @media (min-width: 993px) {
             .toggle-btn-mobile { display: none !important; }
         }
+
+        /* ===== ALIGN LOGO & TEXT (OVERRIDE AMAN) ===== */
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand img {
+            margin-bottom: 0; /* override margin lama */
+        }
+
+        .sidebar-text {
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        /* Ikut logika collapse yang sudah ada */
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
     </style>
 
     @yield('styles')
@@ -230,10 +252,14 @@
         <!-- SIDEBAR -->
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <img src="{{ asset('logo sph.png') }}" alt="Logo">
-                <h5>Semen Padang Hospital<br><span>Admin Panel</span></h5>
+                <div class="sidebar-brand">
+                    <img src="{{ asset('logo sph.png') }}" alt="Logo">
+                    <div class="sidebar-text">
+                        <h5>Semen Padang Hospital</h5>
+                        <span>Admin Panel</span>
+                    </div>
+                </div>
             </div>
-
             <div class="sidebar-nav">
                 <ul class="nav flex-column">
                     <li class="nav-item">
