@@ -5,106 +5,100 @@
 @section('content')
 <div class="container-fluid py-4">
 
-    {{-- Custom Styles --}}
+    {{-- ==================== CUSTOM STYLES ==================== --}}
     <style>
-    /* === Konsistensi Warna & Font === */
-    body {
-        background-color: #f4f6f9 !important; /* warna background sama seperti dashboard */
-        font-family: 'Poppins', sans-serif;
-    }
+        body {
+            background-color: #f0fdf4;
+            font-family: 'Poppins', sans-serif;
+        }
 
-    /* === Card === */
-    .card {
-        border-radius: 18px !important;
-        border: none;
-        background: #fff;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
-    }
+        .card {
+            border-radius: 15px;
+            border: none;
+            animation: fadeInUp 0.5s ease;
+        }
 
-    .card-header {
-        background: linear-gradient(90deg, #118ab2, #06aed5);
-        color: #fff;
-        font-weight: 600;
-        font-size: 1.05rem;
-        letter-spacing: 0.3px;
-        padding: 0.9rem 1.25rem;
-    }
+        .card-header {
+            border-top-left-radius: 15px !important;
+            border-top-right-radius: 15px !important;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+        }
 
-    /* === Label & Input === */
-    label.form-label {
-        color: #2b2d42;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
+        .shadow-soft {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
 
-    .form-control, .form-select {
-        border-radius: 10px;
-        border: 1px solid #dee2e6;
-        transition: all 0.3s ease;
-    }
+        .form-label {
+            font-weight: 600;
+            color: #166534;
+        }
 
-    .form-control:focus, .form-select:focus {
-        border-color: #118ab2;
-        box-shadow: 0 0 0 0.15rem rgba(17, 138, 178, 0.25);
-    }
+        .form-control,
+        .form-select {
+            border-radius: 12px;
+        }
 
-    /* === Button === */
-    .btn {
-        font-weight: 500;
-    }
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(34,197,94,0.25);
+            border-color: #22c55e;
+        }
 
-    .btn-primary {
-        background-color: #118ab2;
-        border: none;
-        transition: all 0.3s ease;
-    }
-    .btn-primary:hover {
-        background-color: #0f7b9f;
-    }
+        .btn-rounded {
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
 
-    .btn-secondary {
-        background-color: #adb5bd;
-        border: none;
-    }
+        .btn-rounded:hover {
+            transform: translateY(-2px);
+        }
 
-    .btn-rounded {
-        border-radius: 50px;
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
-    }
+        .btn-primary {
+            background-color: #22c55e;
+            border: none;
+        }
 
-    /* === Alert Styling === */
-    .alert {
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
+        .btn-primary:hover {
+            background-color: #16a34a;
+        }
 
-    /* === Heading Section === */
-    h3.fw-bold.text-primary {
-        color: #118ab2 !important;
-        letter-spacing: 0.3px;
-    }
-    small.text-muted {
-        font-size: 0.85rem;
-    }
+        .btn-secondary {
+            background-color: #9ca3af;
+            border: none;
+        }
 
-    /* === Responsive Spacing === */
-    .container-fluid.py-4 {
-        padding-top: 2.5rem !important;
-        padding-bottom: 2.5rem !important;
-    }
+        .btn-secondary:hover {
+            background-color: #6b7280;
+        }
 
-    /* === Smooth Transition === */
-    .card, .form-control, .btn, .alert {
-        transition: all 0.25s ease-in-out;
-    }
-</style>
+        .alert {
+            border-radius: 12px;
+        }
 
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
 
-    {{-- Header --}}
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    {{-- ==================== HEADER ==================== --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold text-primary mb-0">
+            <h3 class="fw-bold text-success mb-0">
                 <i class="bi bi-stopwatch-fill me-2"></i>Edit Data Lembur
             </h3>
             <small class="text-muted">Perbarui data pengajuan lembur</small>
@@ -113,13 +107,12 @@
             <i class="bi bi-arrow-left-circle me-1"></i> Kembali
         </a>
     </div>
-    
 
-    {{-- Alerts --}}
+    {{-- ==================== ALERT ==================== --}}
     @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Error!</strong> Mohon periksa kembali inputan Anda.
-            <ul>
+        <div class="alert alert-danger alert-dismissible fade show shadow-soft">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Mohon periksa kembali inputan Anda.
+            <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -128,54 +121,57 @@
         </div>
     @endif
 
-    {{-- Form Card --}}
-    <div class="card">
-        <div class="card-header text-white fw-semibold">
+    {{-- ==================== FORM CARD ==================== --}}
+    <div class="card shadow-soft">
+        <div class="card-header">
             <i class="bi bi-pencil-square me-2"></i>Form Edit Lembur
         </div>
+
         <div class="card-body px-4 py-4">
             <form action="{{ route('lembur.update', $lembur['id']) }}" method="POST">
                 @csrf
                 @method('PUT')
+
                 <div class="row g-3">
-                    {{-- Karyawan (disabled) --}}
+
+                    {{-- Karyawan --}}
                     <div class="col-12">
-                        <label for="karyawan_nama" class="form-label">Karyawan</label>
-                        <input type="text" id="karyawan_nama" class="form-control"
+                        <label class="form-label">Karyawan</label>
+                        <input type="text" class="form-control"
                                value="{{ $lembur['karyawan']['kar_nama'] ?? 'Nama tidak ditemukan' }}" disabled>
                     </div>
 
                     {{-- Tanggal --}}
                     <div class="col-md-4">
-                        <label for="tanggal" class="form-label">Tanggal</label>
-                        <input type="date" name="tanggal" id="tanggal" class="form-control"
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" name="tanggal" class="form-control"
                                value="{{ old('tanggal', \Carbon\Carbon::parse($lembur['tanggal'])->format('Y-m-d')) }}" required>
                     </div>
 
                     {{-- Jam Mulai --}}
                     <div class="col-md-4">
-                        <label for="jam_mulai" class="form-label">Jam Mulai</label>
-                        <input type="time" name="jam_mulai" id="jam_mulai" class="form-control"
+                        <label class="form-label">Jam Mulai</label>
+                        <input type="time" name="jam_mulai" class="form-control"
                                value="{{ old('jam_mulai', \Carbon\Carbon::parse($lembur['jam_mulai'])->format('H:i')) }}" required>
                     </div>
 
                     {{-- Jam Selesai --}}
                     <div class="col-md-4">
-                        <label for="jam_selesai" class="form-label">Jam Selesai</label>
-                        <input type="time" name="jam_selesai" id="jam_selesai" class="form-control"
+                        <label class="form-label">Jam Selesai</label>
+                        <input type="time" name="jam_selesai" class="form-control"
                                value="{{ old('jam_selesai', \Carbon\Carbon::parse($lembur['jam_selesai'])->format('H:i')) }}" required>
                     </div>
 
                     {{-- Alasan --}}
                     <div class="col-12">
-                        <label for="alasan" class="form-label">Alasan Lembur</label>
-                        <textarea name="alasan" id="alasan" class="form-control" rows="3" required>{{ old('alasan', $lembur['alasan']) }}</textarea>
+                        <label class="form-label">Alasan Lembur</label>
+                        <textarea name="alasan" class="form-control" rows="3" required>{{ old('alasan', $lembur['alasan']) }}</textarea>
                     </div>
 
                     {{-- Status --}}
                     <div class="col-md-6">
-                        <label for="status" class="form-label">Status</label>
-                        <select name="status" id="status" class="form-select" required>
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select" required>
                             <option value="Pending" {{ old('status', $lembur['status']) == 'Pending' ? 'selected' : '' }}>Pending</option>
                             <option value="Approved" {{ old('status', $lembur['status']) == 'Approved' ? 'selected' : '' }}>Approved</option>
                             <option value="Rejected" {{ old('status', $lembur['status']) == 'Rejected' ? 'selected' : '' }}>Rejected</option>
@@ -184,12 +180,13 @@
 
                     {{-- Keterangan --}}
                     <div class="col-md-6">
-                        <label for="keterangan" class="form-label">Keterangan (Opsional)</label>
-                        <input type="text" name="keterangan" id="keterangan" class="form-control" value="{{ old('keterangan', $lembur['keterangan']) }}">
+                        <label class="form-label">Keterangan (Opsional)</label>
+                        <input type="text" name="keterangan" class="form-control"
+                               value="{{ old('keterangan', $lembur['keterangan']) }}">
                     </div>
                 </div>
 
-                {{-- Action Buttons --}}
+                {{-- ACTION --}}
                 <div class="mt-4 text-end">
                     <button type="submit" class="btn btn-primary btn-rounded shadow-sm px-4">
                         <i class="bi bi-save me-1"></i> Simpan Perubahan
@@ -198,6 +195,7 @@
                         <i class="bi bi-x-circle me-1"></i> Batal
                     </a>
                 </div>
+
             </form>
         </div>
     </div>

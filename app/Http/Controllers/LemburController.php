@@ -313,4 +313,51 @@ class LemburController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat memproses.');
         }
     }
+
+    public function show($id)
+    {
+        if (! $this->token()) {
+            return redirect()->route('login')->with('error', 'Token tidak ditemukan.');
+        }
+
+        try {
+            $res = Http::withToken($this->token())
+                ->acceptJson()
+                ->get("{$this->apiBase()}/lembur/{$id}");
+
+            if ($res->status() === 403) {
+                return redirect()->route('lembur.index')
+                    ->with('error', 'Anda tidak memiliki akses (Admin only).');
+            }
+
+            if ($res->status() === 401) {
+                return redirect()->route('login')
+                    ->with('error', 'Sesi habis, silakan login ulang.');
+            }
+
+            if ($res->failed()) {
+                return redirect()->route('lembur.index')
+                    ->with('error', $res->json()['message'] ?? 'Data lembur tidak ditemukan.');
+            }
+
+            $data = $res->json()['data'] ?? null;
+
+            if (! $data || ! isset($data['lembur'])) {
+                return redirect()->route('lembur.index')
+                    ->with('error', 'Data lembur kosong.');
+            }
+
+            $lembur = $data['lembur'];
+            $durasi_jam = $data['durasi_jam'] ?? null;
+            $durasi_text = $data['durasi_text'] ?? null;
+
+            return view('lembur.show', compact('lembur', 'durasi_jam', 'durasi_text'));
+
+        } catch (\Exception $e) {
+            Log::error('Error show lembur: ' . $e->getMessage());
+            return redirect()->route('lembur.index')
+                ->with('error', 'Terjadi kesalahan.');
+        }
+    }
+
 }

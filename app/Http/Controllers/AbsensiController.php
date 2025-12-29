@@ -192,7 +192,7 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase().'/absensi/'.$id);
+                ->get($this->apiBase().'/admin/absensi/'.$id);
 
             if ($response->successful()) {
                 $data = $response->json()['data'] ?? null;
@@ -225,7 +225,7 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase().'/absensi/'.$id);
+                ->get($this->apiBase().'/admin/absensi/'.$id);
 
             if ($response->failed()) {
                 return redirect()->route('absensi.index')

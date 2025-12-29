@@ -3,109 +3,115 @@
 @section('title', 'Edit Absensi')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
-    {{-- Custom Styles --}}
+    {{-- ==================== CUSTOM STYLES ==================== --}}
     <style>
-    /* Warna dan font */
-    body {
-        background-color: #f0fdf4 !important;
-        font-family: 'Poppins', sans-serif !important;
-    }
+        body {
+            background-color: #f0fdf4;
+            font-family: 'Poppins', sans-serif;
+        }
 
-    /* Kartu */
-    .card {
-        border-radius: 20px !important;
-        border: none !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-    }
+        .card {
+            border-radius: 15px;
+            border: none;
+            animation: fadeInUp 0.5s ease;
+        }
 
-    /* Header card - gunakan warna oranye untuk edit, biru untuk detail */
-    .card-header {
-        border-top-left-radius: 20px !important;
-        border-top-right-radius: 20px !important;
-        font-weight: 600;
-        color: #fff;
-    }
+        .card-header {
+            border-top-left-radius: 15px !important;
+            border-top-right-radius: 15px !important;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            color: #fff;
+            font-weight: 600;
+        }
 
-    /* Header edit khusus */
-    .card-header:has(h5:contains("Edit")) {
-        background: linear-gradient(90deg, #fbbf24, #f59e0b) !important;
-    }
+        .shadow-soft {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
 
-    /* Header detail khusus */
-    .card-header:has(h5:contains("Informasi")) {
-        background: linear-gradient(90deg, #3b82f6, #2563eb) !important;
-    }
+        .btn-rounded {
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
 
-    /* Label dan teks */
-    .form-label {
-        font-weight: 600;
-        color: #166534;
-    }
+        .btn-rounded:hover {
+            transform: translateY(-2px);
+        }
 
-    h3, h5 {
-        font-weight: 600 !important;
-    }
+        .btn-primary {
+            background-color: #22c55e;
+            border: none;
+        }
 
-    /* Tombol */
-    .btn-rounded {
-        border-radius: 50px !important;
-        padding: 0.4rem 1.2rem !important;
-    }
+        .btn-primary:hover {
+            background-color: #16a34a;
+        }
 
-    .btn-outline-secondary {
-        border-color: #d1d5db !important;
-        color: #374151 !important;
-    }
+        .btn-secondary {
+            background-color: #9ca3af;
+            border: none;
+        }
 
-    .btn-outline-secondary:hover {
-        background-color: #e5e7eb !important;
-        color: #111827 !important;
-    }
+        .btn-secondary:hover {
+            background-color: #6b7280;
+        }
 
-    .btn-warning {
-        background-color: #f59e0b !important;
-        border-color: #f59e0b !important;
-        color: #fff !important;
-    }
+        .form-label {
+            font-weight: 600;
+            color: #166534;
+        }
 
-    .btn-warning:hover {
-        background-color: #d97706 !important;
-        border-color: #d97706 !important;
-    }
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(34,197,94,0.25);
+            border-color: #22c55e;
+        }
 
-    /* Tabel dan alert */
-    .alert {
-        border-radius: 12px !important;
-    }
+        .alert {
+            border-radius: 12px;
+        }
 
-    .table th {
-        background-color: #f0fdf4 !important;
-        color: #166534 !important;
-        font-weight: 600 !important;
-    }
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 
-
-    {{-- Header --}}
+    {{-- ==================== HEADER ==================== --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold text-primary mb-0">
+            <h3 class="fw-bold text-success mb-0">
                 <i class="bi bi-pencil-square me-2"></i>Edit Absensi
             </h3>
-            <small class="text-secondary">Perbarui data absensi karyawan</small>
+            <small class="text-muted">Perbarui data absensi karyawan</small>
         </div>
-        <a href="{{ route('absensi.index') }}" class="btn btn-outline-secondary btn-rounded">
-            <i class="bi bi-arrow-left me-1"></i> Kembali
+        <a href="{{ route('absensi.index') }}" class="btn btn-secondary shadow-sm btn-rounded">
+            <i class="bi bi-arrow-left-circle me-1"></i> Kembali
         </a>
     </div>
 
-    {{-- Alerts --}}
+    {{-- ==================== ALERT ==================== --}}
     @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Gagal!</strong> Terdapat kesalahan pada input Anda.
-            <ul>
+        <div class="alert alert-danger alert-dismissible fade show shadow-soft">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Mohon periksa kembali inputan Anda.
+            <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -113,68 +119,86 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
+
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+        <div class="alert alert-danger alert-dismissible fade show shadow-soft">
+            <i class="bi bi-x-circle-fill me-2"></i>{{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    {{-- Edit Form Card --}}
-    <div class="card">
+    {{-- ==================== FORM CARD ==================== --}}
+    <div class="card shadow-soft">
         <div class="card-header">
-            <h5 class="mb-0 fw-semibold">Form Edit Absensi</h5>
+            <i class="bi bi-calendar-check-fill me-2"></i>Form Edit Absensi
         </div>
+
         <div class="card-body p-4">
             @if($absensi)
             <form action="{{ route('absensi.update', $absensi['id']) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                {{-- DATA UTAMA --}}
+                <div class="row g-3">
+                    <div class="col-md-6">
                         <label class="form-label">Karyawan</label>
-                        <input type="text" class="form-control" value="{{ $absensi['karyawan']['kar_nama'] ?? 'N/A' }}" disabled>
+                        <input type="text" class="form-control"
+                               value="{{ $absensi['karyawan']['kar_nama'] ?? 'N/A' }}" disabled>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label class="form-label">Tanggal</label>
-                        <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($absensi['tanggal'])->isoFormat('dddd, D MMMM Y') }}" disabled>
+                        <input type="text" class="form-control"
+                               value="{{ \Carbon\Carbon::parse($absensi['tanggal'])->isoFormat('dddd, D MMMM Y') }}"
+                               disabled>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Check-in</label>
+                        <input type="time" class="form-control"
+                               value="{{ \Carbon\Carbon::parse($absensi['check_in'])->format('H:i') }}"
+                               disabled>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Check-out</label>
+                        <input type="time" class="form-control"
+                               value="{{ $absensi['check_out'] ? \Carbon\Carbon::parse($absensi['check_out'])->format('H:i') : '' }}"
+                               disabled>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="check_in" class="form-label">Check-in</label>
-                        <input type="time" class="form-control @error('check_in') is-invalid @enderror" id="check_in" name="check_in" value="{{ old('check_in', \Carbon\Carbon::parse($absensi['check_in'])->format('H:i')) }}" disabled>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="check_out" class="form-label">Check-out</label>
-                        <input type="time" class="form-control @error('check_out') is-invalid @enderror" id="check_out" name="check_out" value="{{ old('check_out', $absensi['check_out'] ? \Carbon\Carbon::parse($absensi['check_out'])->format('H:i') : '') }}" disabled>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="latitude" class="form-label">Latitude</label>
-                        <input type="text" class="form-control @error('latitude') is-invalid @enderror" id="latitude" name="latitude" value="{{ old('latitude', $absensi['latitude']) }}" required>
-                         @error('latitude')
+                {{-- LOKASI --}}
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <label class="form-label">Latitude</label>
+                        <input type="text" name="latitude"
+                               class="form-control @error('latitude') is-invalid @enderror"
+                               value="{{ old('latitude', $absensi['latitude']) }}">
+                        @error('latitude')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="longitude" class="form-label">Longitude</label>
-                        <input type="text" class="form-control @error('longitude') is-invalid @enderror" id="longitude" name="longitude" value="{{ old('longitude', $absensi['longitude']) }}" required>
-                         @error('longitude')
+
+                    <div class="col-md-6">
+                        <label class="form-label">Longitude</label>
+                        <input type="text" name="longitude"
+                               class="form-control @error('longitude') is-invalid @enderror"
+                               value="{{ old('longitude', $absensi['longitude']) }}">
+                        @error('longitude')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
-                        @foreach(['Hadir', 'Terlambat', 'Izin', 'Sakit', 'Alpha'] as $s)
-                            <option value="{{ $s }}" {{ old('status', $absensi['status']) == $s ? 'selected' : '' }}>{{ $s }}</option>
+                {{-- STATUS --}}
+                <div class="mt-3">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select @error('status') is-invalid @enderror">
+                        @foreach(['Hadir','Terlambat','Izin','Sakit','Alpha'] as $s)
+                            <option value="{{ $s }}"
+                                {{ old('status', $absensi['status']) == $s ? 'selected' : '' }}>
+                                {{ $s }}
+                            </option>
                         @endforeach
                     </select>
                     @error('status')
@@ -182,18 +206,24 @@
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <label for="keterangan" class="form-label">Keterangan</label>
-                    <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan" rows="3">{{ old('keterangan', $absensi['keterangan']) }}</textarea>
+                {{-- KETERANGAN --}}
+                <div class="mt-3">
+                    <label class="form-label">Keterangan</label>
+                    <textarea name="keterangan" rows="3"
+                        class="form-control @error('keterangan') is-invalid @enderror">{{ old('keterangan', $absensi['keterangan']) }}</textarea>
                     @error('keterangan')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-warning btn-rounded shadow-sm">
-                        <i class="bi bi-save-fill me-1"></i> Simpan Perubahan
+                {{-- ACTION --}}
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-primary btn-rounded shadow-sm px-4">
+                        <i class="bi bi-save me-1"></i> Simpan Perubahan
                     </button>
+                    <a href="{{ route('absensi.index') }}" class="btn btn-secondary btn-rounded shadow-sm px-4">
+                        <i class="bi bi-x-circle me-1"></i> Batal
+                    </a>
                 </div>
             </form>
             @else
