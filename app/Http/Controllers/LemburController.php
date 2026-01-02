@@ -354,10 +354,10 @@ class LemburController extends Controller
             return view('lembur.show', compact('lembur', 'durasi_jam', 'durasi_text'));
 
         } catch (\Exception $e) {
-            Log::error('Error show lembur: ' . $e->getMessage());
+            Log::error('Error show lembur: '.$e->getMessage());
+
             return redirect()->route('lembur.index')
                 ->with('error', 'Terjadi kesalahan.');
         }
     }
-
 }

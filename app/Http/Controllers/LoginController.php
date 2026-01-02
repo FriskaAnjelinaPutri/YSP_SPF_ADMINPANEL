@@ -30,8 +30,9 @@ class LoginController extends Controller
 
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 Log::critical('API_URL environment variable is not set in LoginController.');
+
                 return back()->withInput($request->only('email'))->with('error', 'Kesalahan konfigurasi server: API_URL tidak diatur.');
             }
 

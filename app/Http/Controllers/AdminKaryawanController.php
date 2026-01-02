@@ -17,7 +17,7 @@ class AdminKaryawanController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
 
@@ -54,6 +54,7 @@ class AdminKaryawanController extends Controller
             Log::critical('Could not connect to API for karyawan index.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return view('karyawan.index', ['karyawans' => [], 'error' => 'Could not connect to the API.']);
         }
     }
@@ -67,7 +68,7 @@ class AdminKaryawanController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
             $res = Http::withToken($this->token())->post($apiUrlBase.'/karyawan', $request->all())->json();
@@ -77,6 +78,7 @@ class AdminKaryawanController extends Controller
             Log::critical('Could not connect to API for karyawan store.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return redirect('/karyawan')->with('error', 'Could not connect to the API.');
         }
     }
@@ -85,7 +87,7 @@ class AdminKaryawanController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
             $res = Http::withToken($this->token())->get($apiUrlBase."/karyawan/{$kar_kode}")->json();
@@ -96,6 +98,7 @@ class AdminKaryawanController extends Controller
             Log::critical('Could not connect to API for karyawan edit.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return redirect('/karyawan')->with('error', 'Could not connect to the API.');
         }
     }
@@ -104,7 +107,7 @@ class AdminKaryawanController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
             $res = Http::withToken($this->token())->put($apiUrlBase."/karyawan/{$kar_kode}", $request->all())->json();
@@ -114,6 +117,7 @@ class AdminKaryawanController extends Controller
             Log::critical('Could not connect to API for karyawan update.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return redirect('/karyawan')->with('error', 'Could not connect to the API.');
         }
     }
@@ -122,7 +126,7 @@ class AdminKaryawanController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
             $res = Http::withToken($this->token())->delete($apiUrlBase."/karyawan/{$kar_kode}")->json();
@@ -132,6 +136,7 @@ class AdminKaryawanController extends Controller
             Log::critical('Could not connect to API for karyawan destroy.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return redirect('/karyawan')->with('error', 'Could not connect to the API.');
         }
     }

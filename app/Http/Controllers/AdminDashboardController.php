@@ -16,7 +16,7 @@ class AdminDashboardController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
             $res = Http::withToken($this->token())->get($apiUrlBase.'/dashboard')->json();
@@ -27,6 +27,7 @@ class AdminDashboardController extends Controller
             Log::critical('Could not connect to API for dashboard.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return view('dashboard', ['data' => [], 'error' => 'Could not connect to the API.']);
         }
     }

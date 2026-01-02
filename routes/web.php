@@ -1,17 +1,17 @@
 <?php
 
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\CutiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HelpdeskController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\LemburController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PolaController;
-use App\Http\Controllers\TipeController;
-use App\Http\Controllers\AdminUserController;
-use App\Http\Controllers\HelpdeskController;
-use App\Http\Controllers\LokasiController; // Add this line
+use App\Http\Controllers\TipeController; // Add this line
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {

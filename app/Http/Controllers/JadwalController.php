@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class JadwalController extends Controller
 {
@@ -291,34 +291,35 @@ class JadwalController extends Controller
 
     public function generate()
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
+
         return view('jadwal.generate');
     }
 
     public function generateStore(Request $request)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
         $request->validate([
             'bulan' => 'required|integer|min:1|max:12',
-            'tahun' => 'required|integer|min:' . (date('Y') - 5),
+            'tahun' => 'required|integer|min:'.(date('Y') - 5),
         ]);
 
         $bulan = (int) $request->input('bulan');
         $tahun = (int) $request->input('tahun');
 
         try {
-            $karyawanResponse = Http::withToken($this->token())->get($this->apiBase() . '/karyawan');
+            $karyawanResponse = Http::withToken($this->token())->get($this->apiBase().'/karyawan');
             if ($karyawanResponse->failed()) {
                 return back()->with('error', 'Gagal mengambil data karyawan.');
             }
             $karyawans = $karyawanResponse->json()['data'] ?? [];
 
-            $polaResponse = Http::withToken($this->token())->get($this->apiBase() . '/pola');
+            $polaResponse = Http::withToken($this->token())->get($this->apiBase().'/pola');
             if ($polaResponse->failed()) {
                 return back()->with('error', 'Gagal mengambil data pola kerja.');
             }
@@ -331,11 +332,15 @@ class JadwalController extends Controller
 
             foreach ($karyawans as $karyawan) {
                 $tipeKode = $karyawan['tipe_kode'] ?? null;
-                if (!$tipeKode || !isset($polaByTipe[$tipeKode])) continue;
+                if (! $tipeKode || ! isset($polaByTipe[$tipeKode])) {
+                    continue;
+                }
 
                 $polaKaryawan = $polaByTipe[$tipeKode];
                 $polaCount = $polaKaryawan->count();
-                if ($polaCount === 0) continue;
+                if ($polaCount === 0) {
+                    continue;
+                }
 
                 for ($hari = 1; $hari <= $daysInMonth; $hari++) {
                     $tanggal = sprintf('%04d-%02d-%02d', $tahun, $bulan, $hari);
@@ -343,9 +348,9 @@ class JadwalController extends Controller
                     $jadwalKode = $polaKaryawan[$polaIndex]['jadwal_kode'];
 
                     $jadwalKerja[] = [
-                        'kar_kode'     => $karyawan['kar_kode'],
-                        'jadwal_kode'  => $jadwalKode,
-                        'tanggal'      => $tanggal,
+                        'kar_kode' => $karyawan['kar_kode'],
+                        'jadwal_kode' => $jadwalKode,
+                        'tanggal' => $tanggal,
                     ];
                 }
             }
@@ -357,13 +362,14 @@ class JadwalController extends Controller
             $response = Http::withToken($this->token())
                 ->acceptJson()
                 ->timeout(120) // Tambahkan timeout 120 detik
-                ->post($this->apiBase() . '/jadwal-kerja/generate', [
+                ->post($this->apiBase().'/jadwal-kerja/generate', [
                     'jadwal_kerja' => $jadwalKerja,
                 ]);
 
             if ($response->failed()) {
                 $msg = $response->json()['message'] ?? 'Gagal menyimpan jadwal ke API.';
                 Log::error('Generate jadwal gagal', ['response' => $response->body()]);
+
                 return back()->with('error', $msg);
             }
 
@@ -372,13 +378,14 @@ class JadwalController extends Controller
                 ->with('success', 'Jadwal kerja berhasil digenerate!');
         } catch (\Exception $e) {
             Log::error('Error generate jadwal', ['exception' => $e]);
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
     public function hasilGenerate(Request $request)
     {
-        if (!$this->token()) {
+        if (! $this->token()) {
             return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
         }
 
@@ -389,20 +396,21 @@ class JadwalController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase() . '/jadwal-kerja', [
-                    'bulan'    => $bulan,
-                    'tahun'    => $tahun,
-                    'page'     => $request->input('page', 1),
+                ->get($this->apiBase().'/jadwal-kerja', [
+                    'bulan' => $bulan,
+                    'tahun' => $tahun,
+                    'page' => $request->input('page', 1),
                     'per_page' => 30,
                 ]);
 
             if ($response->failed()) {
                 Log::error('API jadwal-kerja gagal', ['status' => $response->status(), 'body' => $response->body()]);
+
                 return view('jadwal.hasil', [
                     'paginator' => null,
-                    'bulan'     => $bulan,
-                    'tahun'     => $tahun,
-                    'error'     => 'Gagal mengambil data jadwal.',
+                    'bulan' => $bulan,
+                    'tahun' => $tahun,
+                    'error' => 'Gagal mengambil data jadwal.',
                 ]);
             }
 
@@ -421,11 +429,12 @@ class JadwalController extends Controller
             return view('jadwal.hasil', compact('paginator', 'bulan', 'tahun'));
         } catch (\Exception $e) {
             Log::error('Error hasil jadwal', ['exception' => $e]);
+
             return view('jadwal.hasil', [
                 'paginator' => null,
-                'bulan'     => $bulan,
-                'tahun'     => $tahun,
-                'error'     => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'error' => 'Terjadi kesalahan: '.$e->getMessage(),
             ]);
         }
     }

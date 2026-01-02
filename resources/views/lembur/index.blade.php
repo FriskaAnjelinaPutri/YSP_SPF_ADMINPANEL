@@ -101,9 +101,9 @@ h3, h5 { font-weight: 600; }
         </h3>
         <small class="text-secondary">Manajemen data pengajuan lembur</small>
     </div>
-    <a href="{{ route('lembur.create') }}" class="btn btn-primary shadow-sm btn-rounded">
+    {{-- <a href="{{ route('lembur.create') }}" class="btn btn-primary shadow-sm btn-rounded">
         <i class="bi bi-plus-circle me-1"></i> Tambah Pengajuan
-    </a>
+    </a> --}}
 </div>
 
 {{-- === Alerts === --}}

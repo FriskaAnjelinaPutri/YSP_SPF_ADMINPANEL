@@ -23,71 +23,71 @@ class AbsensiController extends Controller
     /**
      * Display a listing of absensi
      */
-        public function index(Request $request)
-        {
-            if (! $this->token()) {
-                return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
+    public function index(Request $request)
+    {
+        if (! $this->token()) {
+            return redirect()->route('login')->with('error', 'Token autentikasi tidak ditemukan.');
+        }
+
+        try {
+            // Ambil parameter dari request
+            $periode = $request->get('periode', Carbon::now()->format('Y-m'));
+            $kar_nama = $request->get('kar_nama');
+            $status = $request->get('status');
+            $page = $request->get('page', 1); // Ambil halaman saat ini
+
+            $url = $this->apiBase().'/absensi';
+
+            // Siapkan parameter untuk API
+            $params = [
+                'periode' => $periode,
+                'page' => $page, // Tambahkan parameter halaman
+            ];
+            if ($kar_nama) {
+                $params['kar_nama'] = $kar_nama;
+            }
+            if ($status) {
+                $params['status'] = $status;
             }
 
-            try {
-                // Ambil parameter dari request
-                $periode = $request->get('periode', Carbon::now()->format('Y-m'));
-                $kar_nama = $request->get('kar_nama');
-                $status = $request->get('status');
-                $page = $request->get('page', 1); // Ambil halaman saat ini
+            $response = Http::withToken($this->token())
+                ->acceptJson()
+                ->get($url, $params);
 
-                $url = $this->apiBase().'/absensi';
-
-                // Siapkan parameter untuk API
-                $params = [
-                    'periode' => $periode,
-                    'page' => $page, // Tambahkan parameter halaman
-                ];
-                if ($kar_nama) {
-                    $params['kar_nama'] = $kar_nama;
-                }
-                if ($status) {
-                    $params['status'] = $status;
-                }
-
-                $response = Http::withToken($this->token())
-                    ->acceptJson()
-                    ->get($url, $params);
-
-                if ($response->failed()) {
-                    Log::error('Gagal mengambil data absensi', [
-                        'status' => $response->status(),
-                        'body' => $response->body(),
-                    ]);
-
-                    return view('absensi.index', [
-                        'absensis' => [], 'links' => null, 'meta' => null,
-                        'periode' => $periode, 'summary' => [], 'kar_nama' => $kar_nama,
-                        'error' => 'Gagal mengambil data absensi dari API',
-                    ]);
-                }
-
-                $data = $response->json();
-                $absensis = $data['data'] ?? [];
-                $links = $data['links'] ?? null;
-                $meta = $data['meta'] ?? null;
-                $summary = $data['summary'] ?? [];
-
-                Log::info('Pagination data from API:', ['links' => $links, 'meta' => $meta]);
-
-                return view('absensi.index', compact('absensis', 'links', 'meta', 'periode', 'summary', 'kar_nama', 'status'));
-
-            } catch (\Exception $e) {
-                Log::error('Error saat mengambil data absensi', ['error' => $e->getMessage()]);
+            if ($response->failed()) {
+                Log::error('Gagal mengambil data absensi', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
 
                 return view('absensi.index', [
                     'absensis' => [], 'links' => null, 'meta' => null,
-                    'periode' => Carbon::now()->format('Y-m'),
-                    'summary' => [], 'kar_nama' => null,
-                    'error' => 'Terjadi kesalahan saat mengambil data: '.$e->getMessage(),
+                    'periode' => $periode, 'summary' => [], 'kar_nama' => $kar_nama,
+                    'error' => 'Gagal mengambil data absensi dari API',
                 ]);
             }
+
+            $data = $response->json();
+            $absensis = $data['data'] ?? [];
+            $links = $data['links'] ?? null; // API does not provide pagination links
+            $meta = $data['meta'] ?? null;   // API does not provide pagination meta
+            $summary = $data['summary'] ?? [];
+
+            Log::info('Pagination data from API:', ['links' => $links, 'meta' => $meta]);
+
+            return view('absensi.index', compact('absensis', 'links', 'meta', 'periode', 'summary', 'kar_nama', 'status'));
+
+        } catch (\Exception $e) {
+            Log::error('Error saat mengambil data absensi', ['error' => $e->getMessage()]);
+
+            return view('absensi.index', [
+                'absensis' => [], 'links' => null, 'meta' => null,
+                'periode' => Carbon::now()->format('Y-m'),
+                'summary' => [], 'kar_nama' => null,
+                'error' => 'Terjadi kesalahan saat mengambil data: '.$e->getMessage(),
+            ]);
         }
+    }
     // /**
     //  * Show the form for creating a new absensi
     //  */
@@ -192,14 +192,51 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase().'/admin/absensi/'.$id);
+                ->get($this->apiBase().'/absensi/'.$id);
 
             if ($response->successful()) {
-                $data = $response->json()['data'] ?? null;
-                $absensi = $data['absensi'] ?? null;
-                $durasi = $data['durasi_kerja'] ?? null;
+                $responseData = $response->json();
+                Log::info('API response for show absensi:', $responseData);
 
-                return view('absensi.show', compact('absensi', 'durasi'));
+                // Check multiple possible structures for the data
+                $absensi = data_get($responseData, 'data.absensi', data_get($responseData, 'data'));
+                $durasi = data_get($responseData, 'data.durasi_kerja');
+
+                // If API returns a list for a single item, take the first one.
+                if (is_array($absensi) && isset($absensi[0])) {
+                    $absensi = $absensi[0];
+                } elseif (is_array($absensi) && empty($absensi)) {
+                    $absensi = null;
+                }
+
+                if ($absensi) {
+                    // Get list karyawan to embed into absensi
+                    $karyawanResponse = Http::withToken($this->token())
+                        ->acceptJson()
+                        ->get($this->apiBase().'/karyawan');
+
+                    $karyawans = $karyawanResponse->successful() ?
+                        ($karyawanResponse->json()['data'] ?? []) : [];
+
+                    // Embed karyawan data into absensi if kar_kode exists
+                    if (isset($absensi['kar_kode']) && ! empty($karyawans)) {
+                        $foundKaryawan = collect($karyawans)->firstWhere('kar_kode', $absensi['kar_kode']);
+                        if ($foundKaryawan) {
+                            $absensi['karyawan'] = $foundKaryawan;
+                        } else {
+                            Log::warning('Karyawan with kar_kode not found for absensi.', ['kar_kode' => $absensi['kar_kode'], 'absensi_id' => $id]);
+                            $absensi['karyawan'] = ['kar_nama' => 'N/A']; // Fallback
+                        }
+                    } else {
+                        $absensi['karyawan'] = ['kar_nama' => 'N/A']; // Fallback if no kar_kode or no karyawan data
+                    }
+
+                    return view('absensi.show', compact('absensi', 'durasi'));
+                }
+
+                Log::warning('Could not find "absensi" data in API response for show.', ['id' => $id, 'response' => $responseData]);
+
+                return redirect()->route('absensi.index')->with('error', 'Struktur data absensi dari API tidak valid.');
             }
 
             return redirect()->route('absensi.index')
@@ -225,15 +262,33 @@ class AbsensiController extends Controller
         try {
             $response = Http::withToken($this->token())
                 ->acceptJson()
-                ->get($this->apiBase().'/admin/absensi/'.$id);
+                ->get($this->apiBase().'/absensi/'.$id); // Corrected endpoint for edit
 
             if ($response->failed()) {
+                Log::error('API call failed for edit absensi', ['id' => $id, 'status' => $response->status()]);
+
                 return redirect()->route('absensi.index')
                     ->with('error', 'Data absensi tidak ditemukan');
             }
 
-            $data = $response->json()['data'] ?? [];
-            $absensi = $data['absensi'] ?? null;
+            $responseData = $response->json(); // Get raw response
+            Log::info('API response for edit absensi:', $responseData); // Log it
+
+            // Check multiple possible structures for the data
+            $absensi = data_get($responseData, 'data.absensi', data_get($responseData, 'data'));
+
+            // If API returns a list for a single item, take the first one.
+            if (is_array($absensi) && isset($absensi[0])) {
+                $absensi = $absensi[0];
+            } elseif (is_array($absensi) && empty($absensi)) {
+                $absensi = null;
+            }
+
+            if (! $absensi) {
+                Log::warning('Could not find "absensi" data in API response for edit.', ['id' => $id, 'response' => $responseData]);
+
+                return redirect()->route('absensi.index')->with('error', 'Struktur data absensi dari API tidak valid untuk edit.');
+            }
 
             // Get list karyawan
             $karyawanResponse = Http::withToken($this->token())
@@ -243,7 +298,28 @@ class AbsensiController extends Controller
             $karyawans = $karyawanResponse->successful() ?
                 ($karyawanResponse->json()['data'] ?? []) : [];
 
-            return view('absensi.edit', compact('absensi', 'karyawans'));
+            // Get list jadwal
+            $jadwalResponse = Http::withToken($this->token())
+                ->acceptJson()
+                ->get($this->apiBase().'/jadwal');
+
+            $jadwals = $jadwalResponse->successful() ?
+                ($jadwalResponse->json()['data'] ?? []) : [];
+
+            // Embed karyawan data into absensi if kar_kode exists
+            if (isset($absensi['kar_kode']) && ! empty($karyawans)) {
+                $foundKaryawan = collect($karyawans)->firstWhere('kar_kode', $absensi['kar_kode']);
+                if ($foundKaryawan) {
+                    $absensi['karyawan'] = $foundKaryawan;
+                } else {
+                    Log::warning('Karyawan with kar_kode not found for absensi.', ['kar_kode' => $absensi['kar_kode'], 'absensi_id' => $id]);
+                    $absensi['karyawan'] = ['kar_nama' => 'N/A']; // Fallback
+                }
+            } else {
+                $absensi['karyawan'] = ['kar_nama' => 'N/A']; // Fallback if no kar_kode or no karyawan data
+            }
+
+            return view('absensi.edit', compact('absensi', 'karyawans', 'jadwals'));
 
         } catch (\Exception $e) {
             Log::error('Error saat mengambil data absensi untuk edit', ['error' => $e->getMessage()]);
@@ -440,5 +516,3 @@ class AbsensiController extends Controller
         }
     }
 }
-
-

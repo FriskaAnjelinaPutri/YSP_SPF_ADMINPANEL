@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class HelpdeskController extends Controller
 {
@@ -17,9 +17,10 @@ class HelpdeskController extends Controller
     private function getApiUrl()
     {
         $apiUrlBase = env('API_URL');
-        if (!$apiUrlBase) {
+        if (! $apiUrlBase) {
             throw new \Exception('API_URL environment variable is not set.');
         }
+
         return $apiUrlBase;
     }
 
@@ -40,14 +41,17 @@ class HelpdeskController extends Controller
 
             if ($response->failed()) {
                 Log::error('Gagal ambil data helpdesk', ['status' => $response->status(), 'body' => $response->body()]);
+
                 return view('helpdesk.index', ['helpdesks' => [], 'periode' => $periode, 'error' => 'Gagal mengambil data helpdesk dari API.']);
             }
 
             $helpdesks = json_decode(json_encode($response->json()['data'] ?? []));
+
             return view('helpdesk.index', compact('helpdesks', 'periode'));
 
         } catch (\Exception $e) {
             Log::critical('Could not connect to API for helpdesk index.', ['exception_message' => $e->getMessage()]);
+
             return view('helpdesk.index', ['helpdesks' => [], 'periode' => $periode ?? Carbon::now()->format('Y-m'), 'error' => 'Could not connect to the API.']);
         }
     }
@@ -61,10 +65,12 @@ class HelpdeskController extends Controller
             if ($response->failed()) {
                 return response()->json(['error' => 'Tiket tidak ditemukan atau gagal mengambil data.'], 404);
             }
+
             return $response->json();
 
         } catch (\Exception $e) {
             Log::critical('Could not connect to API for helpdesk show.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+
             return response()->json(['error' => 'Could not connect to the API.'], 500);
         }
     }
@@ -86,6 +92,7 @@ class HelpdeskController extends Controller
 
         } catch (\Exception $e) {
             Log::critical('Could not connect to API for helpdesk edit.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+
             return redirect()->route('helpdesk.index')->with('error', 'Could not connect to the API.');
         }
     }
@@ -97,7 +104,7 @@ class HelpdeskController extends Controller
             $validated = $request->validate(['status' => 'required|string']);
 
             $response = Http::withToken($this->token())->put($apiUrlBase."/helpdesk/status/{$id}", [
-                'status' => $validated['status']
+                'status' => $validated['status'],
             ]);
 
             if ($response->failed()) {
@@ -108,6 +115,7 @@ class HelpdeskController extends Controller
 
         } catch (\Exception $e) {
             Log::critical('Could not connect to API for helpdesk update.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+
             return back()->with('error', 'Could not connect to the API.');
         }
     }
@@ -121,10 +129,12 @@ class HelpdeskController extends Controller
             if ($response->failed()) {
                 return redirect()->route('helpdesk.index')->with('error', 'Gagal menghapus tiket.');
             }
+
             return redirect()->route('helpdesk.index')->with('message', 'Tiket berhasil dihapus.');
 
         } catch (\Exception $e) {
             Log::critical('Could not connect to API for helpdesk destroy.', ['id' => $id, 'exception_message' => $e->getMessage()]);
+
             return redirect()->route('helpdesk.index')->with('error', 'Could not connect to the API.');
         }
     }

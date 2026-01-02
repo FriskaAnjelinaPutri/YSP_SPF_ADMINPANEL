@@ -20,7 +20,7 @@ class PolaController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
 
@@ -61,6 +61,7 @@ class PolaController extends Controller
             Log::critical('Could not connect to API for pola index.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return view('pola.index', ['polas' => [], 'error' => 'Could not connect to the API.']);
         }
     }
@@ -72,7 +73,7 @@ class PolaController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
 
@@ -92,12 +93,10 @@ class PolaController extends Controller
 
                 if ($respTipe->successful()) {
                     $tipes = $respTipe->json('data', []);
-                }
-                else {
+                } else {
                     Log::warning('Gagal ambil tipe dari API', ['status' => $respTipe->status(), 'body' => $respTipe->body()]);
                 }
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 Log::error('Exception saat ambil tipe: '.$e->getMessage());
             }
 
@@ -109,12 +108,10 @@ class PolaController extends Controller
 
                 if ($respJadwal->successful()) {
                     $jadwals = $respJadwal->json('data', []);
-                }
-                else {
+                } else {
                     Log::warning('Gagal ambil jadwal dari API', ['status' => $respJadwal->status(), 'body' => $respJadwal->body()]);
                 }
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 Log::error('Exception saat ambil jadwal: '.$e->getMessage());
             }
 
@@ -127,6 +124,7 @@ class PolaController extends Controller
             Log::critical('Could not connect to API for pola create.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return redirect()->route('pola.index')->with('error', 'Could not connect to the API.');
         }
     }
@@ -138,7 +136,7 @@ class PolaController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
 
@@ -174,6 +172,7 @@ class PolaController extends Controller
             Log::critical('Could not connect to API for pola store.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return back()->withInput()->with('error', 'Could not connect to the API.');
         }
     }
@@ -185,7 +184,7 @@ class PolaController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
 
@@ -217,6 +216,7 @@ class PolaController extends Controller
             Log::critical('Could not connect to API for pola edit.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return redirect()->route('pola.index')->with('error', 'Could not connect to the API.');
         }
     }
@@ -228,7 +228,7 @@ class PolaController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
 
@@ -262,6 +262,7 @@ class PolaController extends Controller
             Log::critical('Could not connect to API for pola update.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return back()->withInput()->with('error', 'Could not connect to the API.');
         }
     }
@@ -273,7 +274,7 @@ class PolaController extends Controller
     {
         try {
             $apiUrlBase = env('API_URL');
-            if (!$apiUrlBase) {
+            if (! $apiUrlBase) {
                 throw new \Exception('API_URL environment variable is not set.');
             }
 
@@ -296,6 +297,7 @@ class PolaController extends Controller
             Log::critical('Could not connect to API for pola destroy.', [
                 'exception_message' => $e->getMessage(),
             ]);
+
             return back()->with('error', 'Could not connect to the API.');
         }
     }
